@@ -21,4 +21,5 @@
 
 - (IBAction)onLoginButtonPressed:(id)sender;
 - (IBAction)onLoginAndPostButtonPressed:(id)sender;
+- (IBAction)onGooglePlusShareButtonPressed:(id)sender;
 @end

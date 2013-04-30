@@ -10,6 +10,7 @@
 #import <FacebookSDK/FacebookSDK.h>
 #import "SocialNetworkManagerDelegate.h"
 #import <MessageUI/MessageUI.h>
+#import "GPPShare.h"
 
 
 
@@ -20,7 +21,7 @@
 #define IOS_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
 
 
-@interface SocialNetworkManager : NSObject <MFMailComposeViewControllerDelegate>
+@interface SocialNetworkManager : NSObject <MFMailComposeViewControllerDelegate, GPPShareDelegate>
 
 
 @property (nonatomic, retain) NSObject<SocialNetworkManagerDelegate>*  mDelegate;
@@ -46,13 +47,16 @@
 #pragma mark Facebook
 
 
-- (void)loginFacebookWithPermissions:(NSArray*)_Permissions
-                         forDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
-                   CompletionHandler:(void (^)(void))_Action;
+
+- (void)loginFacebookWithReadPermissions:(NSArray*)_Permissions
+                             forDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
+                       CompletionHandler:(void (^)(void))_Action;
+- (void)loginFacebookWithPublishPermissions:(NSArray*)_Permissions
+                                forDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
+                          CompletionHandler:(void (^)(void))_Action;
 - (void)closeSessionAndClearToken;
 
-- (void)facebookPublishName:(NSString*)_Name
-                       Link:(NSURL*)_Link
+- (void)facebookPublishLink:(NSURL*)_Link
                     caption:(NSString*)_Caption
                 description:(NSString*)_Description
                     picture:(NSURL*)_Picture
@@ -60,8 +64,10 @@
 - (void)facebookPresentFriendPickerForDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate;
 
 
+
 #pragma mark -
 #pragma mark Mail
+
 
 
 - (void)launchMailWithSubject:(NSString *)_Subject
@@ -76,11 +82,24 @@
 #pragma mark Twitter
 
 
+
 - (void)postTwitterFeedsWithText:(NSString*)_Text
                            image:(UIImage*)_Image
                              url:(NSURL*)_URL
                      forDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate;
 
+
+
+#pragma mark -
+#pragma mark Google +
+
+
+
+- (void)googlePlusShareLink:(NSURL*)_Link
+                    caption:(NSString*)_Caption
+                description:(NSString*)_Description
+                    picture:(NSURL*)_Picture
+                   delegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate;
 
 
 @end

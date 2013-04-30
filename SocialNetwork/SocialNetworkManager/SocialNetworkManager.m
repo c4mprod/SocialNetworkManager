@@ -10,6 +10,13 @@
 #import "SocialNetworkManagerDelegate.h"
 #import <Social/Social.h>
 #import <Twitter/Twitter.h>
+#import "AFHTTPClient.h"
+#import "AFNetworking.h"
+#import "SNMTweet.h"
+#import "JSONKit.h"
+#import "GPPShare.h"
+
+
 
 
 @implementation SocialNetworkManager
@@ -103,8 +110,7 @@ static SocialNetworkManager *sharedInstance = nil;
 
 
 // Post Status Update button handler; will attempt different approaches depending upon configuration.
-- (void)facebookPublishName:(NSString*)_Name
-                       Link:(NSURL*)_Link
+- (void)facebookPublishLink:(NSURL*)_Link
                     caption:(NSString*)_Caption
                 description:(NSString*)_Description
                     picture:(NSURL*)_Picture
@@ -135,9 +141,9 @@ static SocialNetworkManager *sharedInstance = nil;
     else
     {
         // Lastly, fall back on a request for permissions and a direct post using the Graph API
-        [self loginFacebookWithPermissions:[NSArray arrayWithObject:@"publish_actions"]
-                               forDelegate:_Delegate
-                         CompletionHandler:^
+        [self loginFacebookWithPublishPermissions:nil
+                                      forDelegate:_Delegate
+                                CompletionHandler:^
          {
              [self postFeedWithDescription:_Description
                                       link:_Link
@@ -172,9 +178,9 @@ static SocialNetworkManager *sharedInstance = nil;
     else
     {
         // Lastly, fall back on a request for permissions and a direct post using the Graph API
-        [self loginFacebookWithPermissions:[NSArray arrayWithObject:@"publish_actions"]
-                               forDelegate:_Delegate
-                         CompletionHandler:^
+        [self loginFacebookWithReadPermissions:nil
+                                   forDelegate:_Delegate
+                             CompletionHandler:^
          {
              [self presentFriendPickerForDelegate:_Delegate];
          }];
@@ -215,9 +221,9 @@ static SocialNetworkManager *sharedInstance = nil;
 }
 
 
-- (void)loginFacebookWithPermissions:(NSArray*)_Permissions
-                         forDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
-                   CompletionHandler:(void (^)(void))_Action
+- (void)loginFacebookWithReadPermissions:(NSArray*)_Permissions
+                             forDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
+                       CompletionHandler:(void (^)(void))_Action
 {
     NSMutableArray* lNotGrandedPermissions = [NSMutableArray array];
     
@@ -229,29 +235,68 @@ static SocialNetworkManager *sharedInstance = nil;
         }
     }
     
-   [FBSession openActiveSessionWithPublishPermissions:lNotGrandedPermissions
+    [FBSession openActiveSessionWithReadPermissions:lNotGrandedPermissions
+                                       allowLoginUI:TRUE
+                                  completionHandler:^(FBSession *_Session, FBSessionState status, NSError *_Error)
+     {
+         if (!_Error)
+         {
+             if (FB_ISSESSIONOPENWITHSTATE(_Session.state))
+             {
+                 _Action();
+                 
+                 [self notifyDelegateForFacebookSuccessLogin:_Delegate];
+             }
+             else if (FB_ISSESSIONSTATETERMINAL(_Session.state))
+             {
+                 [self notifyDelegateForFacebookLoginCancelledDelegate:_Delegate];
+             }
+         }
+         else
+         {
+             [self notifyDelegateForFacebookLoginFail:_Delegate ForError:_Error withStatus:_Session.state];
+         }
+     }];
+}
+
+
+- (void)loginFacebookWithPublishPermissions:(NSArray*)_Permissions
+                                forDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
+                          CompletionHandler:(void (^)(void))_Action
+{
+    NSMutableArray* lNotGrandedPermissions = [NSMutableArray array];
+    
+    for (NSString* aPermission in _Permissions)
+    {
+        if ([FBSession.activeSession.permissions indexOfObject:aPermission] == NSNotFound)
+        {
+            [lNotGrandedPermissions addObject:aPermission];
+        }
+    }
+    
+    [FBSession openActiveSessionWithPublishPermissions:lNotGrandedPermissions
                                        defaultAudience:FBSessionDefaultAudienceFriends
                                           allowLoginUI:TRUE
                                      completionHandler:^(FBSession *_Session, FBSessionState status, NSError *_Error)
-    {
-        if (!_Error)
-        {                        
-            if (FB_ISSESSIONOPENWITHSTATE(_Session.state))
-            {
-                _Action();
-                
-                [self notifyDelegateForFacebookSuccessLogin:_Delegate];
-            }
-            else if (FB_ISSESSIONSTATETERMINAL(_Session.state))
-            {
-                [self notifyDelegateForFacebookLoginCancelledDelegate:_Delegate];
-            }
-        }
-        else
-        {
-            [self notifyDelegateForFacebookLoginFail:_Delegate ForError:_Error withStatus:_Session.state];
-        }
-    }];
+     {
+         if (!_Error)
+         {
+             if (FB_ISSESSIONOPENWITHSTATE(_Session.state))
+             {
+                 _Action();
+                 
+                 [self notifyDelegateForFacebookSuccessLogin:_Delegate];
+             }
+             else if (FB_ISSESSIONSTATETERMINAL(_Session.state))
+             {
+                 [self notifyDelegateForFacebookLoginCancelledDelegate:_Delegate];
+             }
+         }
+         else
+         {
+             [self notifyDelegateForFacebookLoginFail:_Delegate ForError:_Error withStatus:_Session.state];
+         }
+     }];
 }
 
 
@@ -307,11 +352,6 @@ static SocialNetworkManager *sharedInstance = nil;
 
 #pragma mark -
 #pragma mark Mail Composer Delegate Methods
-
-
-
-#pragma mark -
-#pragma mark Mail Methods
 
 
 
@@ -479,6 +519,110 @@ static SocialNetworkManager *sharedInstance = nil;
      }];
     
     [lAccountStore release];
+}
+
+
+- (BOOL) getTweetFromURL:(NSString*)_Tweet ForDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
+{
+    BOOL isURLCompatible = NO;
+    
+    //            NSString* tweeturl = [NSString stringWithFormat:@"https://api.twitter.com/1/statuses/show/%@.json",[array objectAtIndex:1]];
+    NSArray* array = [_Tweet componentsSeparatedByString:@"https://twitter.com/"];
+    if([array count] != 2)
+    {
+        array = [_Tweet componentsSeparatedByString:@"https://mobile.twitter.com/"];
+    }
+    
+    if([array count] == 2)
+    {
+        NSString* string = [array objectAtIndex:1];
+        array = [string componentsSeparatedByString:@"/status/"];
+        if([array count] == 2)
+        {
+            NSString* tweeturl = [NSString stringWithFormat:@"https://api.twitter.com/1/statuses/show.json?id=%@&include_entities=true",[array objectAtIndex:1]];
+            NSURLRequest * request= [NSURLRequest requestWithURL:[NSURL URLWithString:tweeturl]];
+            AFHTTPRequestOperation *operation = [[[AFHTTPRequestOperation alloc] initWithRequest:request] autorelease];
+            [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject)
+             {
+                 NSString *filesContent					= [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
+                 id objectreponse						= [filesContent mutableObjectFromJSONString];
+                 [filesContent release];
+                 [_Delegate didGetTweet:[SNMTweet createTweetObjectWithDictionary:objectreponse]];
+             }
+                                             failure:^(AFHTTPRequestOperation *operation, NSError *error)
+             {
+                 [_Delegate didFailGettingTweet:error];
+             }];
+            AFHTTPClient* client = [AFHTTPClient clientWithBaseURL:[NSURL URLWithString:@"c4mprod.com"]];
+            [client enqueueHTTPRequestOperation:operation];
+            isURLCompatible = YES;
+        }
+    }
+    return isURLCompatible;
+}
+
+/**
+ * check if an url is twitter compatible
+ * @return YES if the url tweet is compatible, NO if it's a wrong URL
+ */
+- (BOOL) isTwitterURL:(NSString*)_TweetURL
+{
+    BOOL isURLCompatible = NO;
+    NSArray* array = [_TweetURL componentsSeparatedByString:@"https://twitter.com/"];
+    if([array count] != 2)
+    {
+        array = [_TweetURL componentsSeparatedByString:@"https://mobile.twitter.com/"];
+    }
+    
+    if([array count] == 2)
+    {
+        NSString* string = [array objectAtIndex:1];
+        array = [string componentsSeparatedByString:@"/status/"];
+        if([array count] == 2)
+        {
+            isURLCompatible = YES;
+        }
+    }
+    return isURLCompatible;
+}
+
+
+
+#pragma mark -
+#pragma mark Google +
+
+
+
+- (void)googlePlusShareLink:(NSURL*)_Link
+                    caption:(NSString*)_Caption
+                description:(NSString*)_Description
+                    picture:(NSURL*)_Picture
+                   delegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
+{
+    self.mDelegate = _Delegate;
+    [GPPShare sharedInstance].delegate = self;
+    id<GPPShareBuilder> shareBuilder = [[GPPShare sharedInstance] shareDialog];
+    
+    [shareBuilder setContentDeepLinkID:@"test"];
+    [shareBuilder setURLToShare:_Link];
+    [shareBuilder setTitle:_Caption
+               description:_Description
+              thumbnailURL:_Picture];
+    
+    [shareBuilder open];
+}
+
+
+- (void)finishedSharing:(BOOL)_Share
+{
+    if (_Share && [mDelegate respondsToSelector:@selector(googlePlusDidSuccessfullyShare)])
+    {
+        [mDelegate googlePlusDidSuccessfullyShare];
+    }
+    else if ([mDelegate respondsToSelector:@selector(googlePlusDidSuccessfullyShare)])
+    {
+        [mDelegate googlePlusDidCancelShare];        
+    }
 }
 
 

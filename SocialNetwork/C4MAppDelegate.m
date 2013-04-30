@@ -9,10 +9,17 @@
 #import "C4MAppDelegate.h"
 #import "LoginViewController.h"
 #import "SocialNetworkManager.h"
+#import "GPPSignIn.h"
+#import "GPPURLHandler.h"
+
 
 
 
 @implementation C4MAppDelegate
+
+
+static NSString * const kClientId = @"342245785767.apps.googleusercontent.com";
+
 
 - (void)dealloc
 {
@@ -22,6 +29,10 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    // Set app's client ID for |GPPSignIn| and |GPPShare|.
+    [GPPSignIn sharedInstance].clientID = kClientId;
+    
+    
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
     // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor whiteColor];
@@ -33,6 +44,11 @@
     [lLoginViewController release];
     self.window.rootViewController = lNavigationController;
     [lNavigationController release];
+    
+    
+    // Read Google+ deep-link data.
+    [GPPDeepLink setDelegate:self];
+    [GPPDeepLink readDeepLinkAfterInstall];
     
     return YES;
 }
@@ -85,10 +101,18 @@
             openURL:(NSURL *)url
   sourceApplication:(NSString *)sourceApplication
          annotation:(id)annotation {
+    
     // attempt to extract a token from the url
-    return [FBAppCall handleOpenURL:url
+    if ([FBAppCall handleOpenURL:url
+               sourceApplication:sourceApplication
+                     withSession:[FBSession activeSession]])
+    {
+        return TRUE;
+    }
+    
+    return [GPPURLHandler handleURL:url
                   sourceApplication:sourceApplication
-                        withSession:[FBSession activeSession]];
+                         annotation:annotation];
 }
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
@@ -110,5 +134,21 @@
     // close notification in order to do cleanup
     [[FBSession activeSession] close];
 }
+
+
+#pragma mark -
+#pragma mark GPPDeepLinkDelegate
+
+- (void)didReceiveDeepLink:(GPPDeepLink *)deepLink {
+    // An example to handle the deep link data.
+    UIAlertView *alert = [[[UIAlertView alloc]
+                           initWithTitle:@"Deep-link Data"
+                           message:[deepLink deepLinkID]
+                           delegate:nil
+                           cancelButtonTitle:@"OK"
+                           otherButtonTitles:nil] autorelease];
+    [alert show];
+}
+
 
 @end

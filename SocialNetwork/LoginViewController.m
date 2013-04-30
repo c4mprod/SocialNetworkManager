@@ -65,11 +65,11 @@
 
 - (IBAction)onLoginButtonPressed:(id)sender
 {
-    _mLoader.hidden = FALSE;    
+    _mLoader.hidden = FALSE;
     
-    [[SocialNetworkManager sharedSocialNetworkManager] loginFacebookWithPermissions:nil
-                                                                        forDelegate:self
-                                                                  CompletionHandler:^
+    [[SocialNetworkManager sharedSocialNetworkManager] loginFacebookWithReadPermissions:nil
+                                                                            forDelegate:self
+                                                                      CompletionHandler:^
      {}];
 }
 
@@ -77,8 +77,18 @@
 {
     _mLoader.hidden = FALSE;
     
-    [[SocialNetworkManager sharedSocialNetworkManager] facebookPublishName:@"Name"
-                                                                      Link:[NSURL URLWithString:@"http://www.c4mprod.com"]
+    [[SocialNetworkManager sharedSocialNetworkManager] facebookPublishLink:nil
+                                                                   caption:@"Caption"
+                                                               description:@"Description"
+                                                                   picture:[NSURL URLWithString:@"https://lh3.googleusercontent.com/-cD3cctbz8bE/TjEVQizURWI/AAAAAAAAVxM/Hcxoa6qHASg/w947-h710/C4M+PROD"]
+                                                                  delegate:self];
+}
+
+- (IBAction)onGooglePlusShareButtonPressed:(id)sender
+{
+    _mLoader.hidden = FALSE;
+    
+    [[SocialNetworkManager sharedSocialNetworkManager] googlePlusShareLink:[NSURL URLWithString:@"http://www.c4mprod.com"]
                                                                    caption:@"Caption"
                                                                description:@"Description"
                                                                    picture:[NSURL URLWithString:@"https://lh3.googleusercontent.com/-cD3cctbz8bE/TjEVQizURWI/AAAAAAAAVxM/Hcxoa6qHASg/w947-h710/C4M+PROD"]
@@ -150,6 +160,23 @@
     [lAlert release];
 }
 
+
+- (void)googlePlusDidSuccessfullyShare
+{
+    _mLoader.hidden = TRUE;
+    UIAlertView* lAlert = [[UIAlertView alloc] initWithTitle:@"G+" message:@"Share succeded" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    [lAlert show];
+    [lAlert release];
+}
+
+
+- (void)googlePlusDidCancelShare
+{
+    _mLoader.hidden = TRUE;
+    UIAlertView* lAlert = [[UIAlertView alloc] initWithTitle:@"G+" message:@"Share did cancel" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    [lAlert show];
+    [lAlert release];
+}
 
 
 @end

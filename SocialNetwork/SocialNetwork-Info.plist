@@ -20,8 +20,24 @@
 	<string>1.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.facebook.sdk.samples.hellofacebook</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.facebook.sdk.samples.hellofacebook</string>
+				<string>fb355198514515820</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
+	<key>FacebookAppID</key>
+	<string>355198514515820</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -41,16 +57,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>fb355198514515820</string>
-			</array>
-		</dict>
-	</array>
-	<key>FacebookAppID</key>
-	<string>355198514515820</string>
 </dict>
 </plist>

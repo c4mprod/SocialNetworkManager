@@ -10,11 +10,10 @@
 #import <FacebookSDK/FacebookSDK.h>
 
 
+@class SNMTweet;
+
+
 @protocol SocialNetworkManagerDelegate <NSObject>
-
-
-
-
 
 @optional
 
@@ -46,4 +45,12 @@
 
 - (void)twitterDidSuccessfullyShare;
 - (void)twitterDidCancelShare;
+
+- (void)didGetTweet:(SNMTweet*)_Tweet;
+- (void)didFailGettingTweet:(NSError*)_Error;
+
+
+- (void)googlePlusDidSuccessfullyShare;
+- (void)googlePlusDidCancelShare;
+
 @end
