@@ -7,7 +7,7 @@
 //
 
 #import "SNMTweet.h"
-#import "AFNetworking.h"
+#import <RestKit/AFNetworking.h>
 
 
 @implementation SNMTweet

@@ -10,8 +10,8 @@
 #import "SocialNetworkManagerDelegate.h"
 #import <Social/Social.h>
 #import <Twitter/Twitter.h>
-#import "AFHTTPClient.h"
-#import "AFNetworking.h"
+//#import "AFHTTPClient.h"
+#import <RestKit/AFNetworking.h>
 #import "SNMTweet.h"
 #import "JSONKit.h"
 #import "GPPShare.h"
@@ -634,7 +634,10 @@ static SocialNetworkManager *sharedInstance = nil;
 
 - (void)notifyDelegateForFacebookSuccessLogin:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
 {
+  if ([_Delegate respondsToSelector:@selector(facebookSessionDidSuccessfullyLogin)])
+  {
     [_Delegate facebookSessionDidSuccessfullyLogin];
+  }
 }
 
 

@@ -14,10 +14,9 @@
 
 
 @protocol SocialNetworkManagerDelegate <NSObject>
+- (UIViewController*)viewControllerToPresentSocialNetwork;
 
 @optional
-
-- (UIViewController*)viewControllerToPresentSocialNetwork;
 
 
 - (void)facebookSessionDidSuccessfullyLogin;
