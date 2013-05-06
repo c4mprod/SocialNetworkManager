@@ -11,7 +11,7 @@
 #import <Social/Social.h>
 #import <Twitter/Twitter.h>
 //#import "AFHTTPClient.h"
-#import <RestKit/AFNetworking.h>
+#import "AFNetworking.h"
 #import "SNMTweet.h"
 #import "JSONKit.h"
 #import "GPPShare.h"
@@ -381,7 +381,7 @@ static SocialNetworkManager *sharedInstance = nil;
         
         [mailComposeController setMessageBody:_Body isHTML:_Html];
         
-        [[_Delegate viewControllerToPresentSocialNetwork] presentViewController:mailComposeController animated:TRUE completion:nil];
+        [[_Delegate viewControllerToPresentSocialNetwork] presentModalViewController:mailComposeController animated:TRUE];
         [mailComposeController release];
     }
 	else
@@ -392,6 +392,36 @@ static SocialNetworkManager *sharedInstance = nil;
 		}
 	}
 }
+
+
+- (void)launchSMSWithText:(NSString*)_Text
+                recipient:(NSArray *)_Recipients
+              andDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
+{
+    if ([MFMessageComposeViewController canSendText])
+    {
+        MFMessageComposeViewController* smsViewController = [[MFMessageComposeViewController alloc] init];
+        smsViewController.messageComposeDelegate = self;
+        [smsViewController setBody:_Text];
+        [smsViewController setRecipients:_Recipients];
+        self.mDelegate = _Delegate;
+        
+        
+        smsViewController.navigationBar.barStyle = [_Delegate viewControllerToPresentSocialNetwork].navigationController.navigationBar.barStyle;
+        smsViewController.navigationBar.tintColor = [_Delegate viewControllerToPresentSocialNetwork].navigationController.navigationBar.tintColor;
+        
+        
+        [[_Delegate viewControllerToPresentSocialNetwork] presentModalViewController:smsViewController animated:TRUE];
+    }
+	else
+	{
+		if ([_Delegate respondsToSelector:@selector(NoSMSConfigured)])
+		{
+			[_Delegate NoSMSConfigured];
+		}
+	}
+}
+
 
 
 - (void)mailComposeController:(MFMailComposeViewController*)_Controller
@@ -425,6 +455,36 @@ static SocialNetworkManager *sharedInstance = nil;
                 [mDelegate EmailFail];
             }
             break;            
+        default:
+            break;
+    }
+    self.mDelegate = nil;
+}
+
+
+- (void)messageComposeViewController:(MFMessageComposeViewController *)_Controller didFinishWithResult:(MessageComposeResult)_Result
+{
+    [_Controller dismissViewControllerAnimated:TRUE completion:nil];
+    
+    switch (_Result) {
+        case MessageComposeResultCancelled:
+            if ([mDelegate respondsToSelector:@selector(SMSCancelled)])
+            {
+                [mDelegate SMSCancelled];
+            }
+            break;
+        case MessageComposeResultSent:
+            if ([mDelegate respondsToSelector:@selector(SMSSent)])
+            {
+                [mDelegate SMSSent];
+            }
+            break;
+        case MessageComposeResultFailed:
+            if ([mDelegate respondsToSelector:@selector(SMSFail)])
+            {
+                [mDelegate SMSFail];
+            }
+            break;
         default:
             break;
     }
@@ -467,7 +527,7 @@ static SocialNetworkManager *sharedInstance = nil;
                          break;
                  }
              }];
-            [[_Delegate viewControllerToPresentSocialNetwork] presentViewController:tweetSheet animated:TRUE completion:nil];
+            [[_Delegate viewControllerToPresentSocialNetwork] presentModalViewController:tweetSheet animated:TRUE];
         }
     }
     else if (IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"6.0"))
@@ -493,7 +553,7 @@ static SocialNetworkManager *sharedInstance = nil;
                         break;
                 }
             }];
-            [[_Delegate viewControllerToPresentSocialNetwork] presentViewController:tweetSheet animated:YES completion:nil];
+            [[_Delegate viewControllerToPresentSocialNetwork] presentModalViewController:tweetSheet animated:TRUE];
         }
     }
 }

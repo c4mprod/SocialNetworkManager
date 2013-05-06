@@ -21,7 +21,7 @@
 #define IOS_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
 
 
-@interface SocialNetworkManager : NSObject <MFMailComposeViewControllerDelegate, GPPShareDelegate>
+@interface SocialNetworkManager : NSObject <MFMailComposeViewControllerDelegate, MFMessageComposeViewControllerDelegate, GPPShareDelegate>
 
 
 @property (nonatomic, retain) NSObject<SocialNetworkManagerDelegate>*  mDelegate;
@@ -76,6 +76,10 @@
                    addressees:(NSArray *)_AddresseesMail
                   andDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate;
 
+
+- (void)launchSMSWithText:(NSString*)_Text
+                recipient:(NSArray *)_AddresseesMail
+              andDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate;
 
 
 #pragma mark -

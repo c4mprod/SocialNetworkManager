@@ -95,6 +95,15 @@
                                                                   delegate:self];
 }
 
+- (IBAction)onSMSButtonPressed:(id)sender
+{
+    _mLoader.hidden = FALSE;
+    
+    [[SocialNetworkManager sharedSocialNetworkManager] launchSMSWithText:@"sms text"
+                                                               recipient:[NSArray arrayWithObject:@"0650747164"]
+                                                             andDelegate:self];
+}
+
 
 
 #pragma mark -

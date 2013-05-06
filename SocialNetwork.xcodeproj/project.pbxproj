@@ -544,8 +544,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7BAB87CF1729186A00FB6780 /* Build configuration list for PBXNativeTarget "SocialNetwork" */;
 			buildPhases = (
-				7BAB87AE1729186A00FB6780 /* Sources */,
 				7BAB87AF1729186A00FB6780 /* Frameworks */,
+				7BAB87AE1729186A00FB6780 /* Sources */,
 				7BAB87B01729186A00FB6780 /* Resources */,
 			);
 			buildRules = (
