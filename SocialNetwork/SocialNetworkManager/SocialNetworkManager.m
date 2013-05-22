@@ -141,7 +141,7 @@ static SocialNetworkManager *sharedInstance = nil;
     else
     {
         // Lastly, fall back on a request for permissions and a direct post using the Graph API
-        [self loginFacebookWithPublishPermissions:nil
+        [self loginFacebookWithPublishPermissions:[NSArray arrayWithObject:@"publish_actions"]
                                       forDelegate:_Delegate
                                 CompletionHandler:^
          {
@@ -599,6 +599,7 @@ static SocialNetworkManager *sharedInstance = nil;
                     picture:(NSURL*)_Picture
                    delegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
 {
+    C4MLog(@"");
     self.mDelegate = _Delegate;
     [GPPShare sharedInstance].delegate = self;
     id<GPPShareBuilder> shareBuilder = [[GPPShare sharedInstance] shareDialog];
