@@ -38,6 +38,11 @@
 - (void)EmailCancelled;
 - (void)EmailFail;
 
+- (void)NoSMSConfigured;
+- (void)SMSSent;
+- (void)SMSCancelled;
+- (void)SMSFail;
+
 
 - (void)twitterSessionDidSuccessfullyLogin;
 - (void)twitterSessionDidFailLoginWithError:(NSError*)_Error;
