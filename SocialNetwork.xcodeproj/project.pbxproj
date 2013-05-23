@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7B85EF18174E6CD800108CF5 /* SocialNetworkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B85EF16174E6CD800108CF5 /* SocialNetworkManager.m */; };
 		7BAB87B61729186A00FB6780 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7BAB87B51729186A00FB6780 /* UIKit.framework */; };
 		7BAB87B81729186A00FB6780 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7BAB87B71729186A00FB6780 /* Foundation.framework */; };
 		7BAB87BA1729186A00FB6780 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7BAB87B91729186A00FB6780 /* CoreGraphics.framework */; };
@@ -26,7 +27,6 @@
 		7BAB87E11729199100FB6780 /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7BAB87E01729199100FB6780 /* Social.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		7BAB87E517291AC800FB6780 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BAB87E317291AC800FB6780 /* LoginViewController.m */; };
 		7BAB87E617291AC800FB6780 /* LoginViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BAB87E417291AC800FB6780 /* LoginViewController.xib */; };
-		7BAB87EA17291EFC00FB6780 /* SocialNetworkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BAB87E917291EFC00FB6780 /* SocialNetworkManager.m */; };
 		7BAB87EF1729256900FB6780 /* LogoutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BAB87ED1729256900FB6780 /* LogoutViewController.m */; };
 		7BAB87F01729256900FB6780 /* LogoutViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BAB87EE1729256900FB6780 /* LogoutViewController.xib */; };
 		7BB892E7172FBB2700E2520B /* AFHTTPClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BB892D5172FBB2700E2520B /* AFHTTPClient.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
@@ -92,6 +92,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7B85EF15174E6CD800108CF5 /* SocialNetworkManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SocialNetworkManager.h; path = SocialNetworkManager/SocialNetworkManager.h; sourceTree = "<group>"; };
+		7B85EF16174E6CD800108CF5 /* SocialNetworkManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SocialNetworkManager.m; path = SocialNetworkManager/SocialNetworkManager.m; sourceTree = "<group>"; };
+		7B85EF17174E6CD800108CF5 /* SocialNetworkManagerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SocialNetworkManagerDelegate.h; path = SocialNetworkManager/SocialNetworkManagerDelegate.h; sourceTree = "<group>"; };
 		7BAB87B21729186A00FB6780 /* SocialNetwork.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SocialNetwork.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BAB87B51729186A00FB6780 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		7BAB87B71729186A00FB6780 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -116,9 +119,6 @@
 		7BAB87E217291AC800FB6780 /* LoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
 		7BAB87E317291AC800FB6780 /* LoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
 		7BAB87E417291AC800FB6780 /* LoginViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoginViewController.xib; sourceTree = "<group>"; };
-		7BAB87E817291EFC00FB6780 /* SocialNetworkManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SocialNetworkManager.h; path = SocialNetworkManager/SocialNetworkManager.h; sourceTree = "<group>"; };
-		7BAB87E917291EFC00FB6780 /* SocialNetworkManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SocialNetworkManager.m; path = SocialNetworkManager/SocialNetworkManager.m; sourceTree = "<group>"; };
-		7BAB87EB1729205A00FB6780 /* SocialNetworkManagerDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SocialNetworkManagerDelegate.h; path = SocialNetworkManager/SocialNetworkManagerDelegate.h; sourceTree = "<group>"; };
 		7BAB87EC1729256900FB6780 /* LogoutViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogoutViewController.h; sourceTree = "<group>"; };
 		7BAB87ED1729256900FB6780 /* LogoutViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogoutViewController.m; sourceTree = "<group>"; };
 		7BAB87EE1729256900FB6780 /* LogoutViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LogoutViewController.xib; sourceTree = "<group>"; };
@@ -351,9 +351,9 @@
 			isa = PBXGroup;
 			children = (
 				7BB892F0172FBB7900E2520B /* SNMTweet */,
-				7BAB87E817291EFC00FB6780 /* SocialNetworkManager.h */,
-				7BAB87E917291EFC00FB6780 /* SocialNetworkManager.m */,
-				7BAB87EB1729205A00FB6780 /* SocialNetworkManagerDelegate.h */,
+				7B85EF15174E6CD800108CF5 /* SocialNetworkManager.h */,
+				7B85EF16174E6CD800108CF5 /* SocialNetworkManager.m */,
+				7B85EF17174E6CD800108CF5 /* SocialNetworkManagerDelegate.h */,
 			);
 			name = SocialNetworkManager;
 			sourceTree = "<group>";
@@ -612,7 +612,6 @@
 				7BAB87C21729186A00FB6780 /* main.m in Sources */,
 				7BAB87C61729186A00FB6780 /* C4MAppDelegate.m in Sources */,
 				7BAB87E517291AC800FB6780 /* LoginViewController.m in Sources */,
-				7BAB87EA17291EFC00FB6780 /* SocialNetworkManager.m in Sources */,
 				7BAB87EF1729256900FB6780 /* LogoutViewController.m in Sources */,
 				7BB892E7172FBB2700E2520B /* AFHTTPClient.m in Sources */,
 				7BB892E8172FBB2700E2520B /* AFHTTPRequestOperation.m in Sources */,
@@ -666,6 +665,7 @@
 				7BB89388172FBED500E2520B /* GTMOAuth2ViewControllerTouch.m in Sources */,
 				7BB8938A172FBED500E2520B /* GTMObjC2Runtime.m in Sources */,
 				7BB8938B172FBED500E2520B /* OpenInChromeController.m in Sources */,
+				7B85EF18174E6CD800108CF5 /* SocialNetworkManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

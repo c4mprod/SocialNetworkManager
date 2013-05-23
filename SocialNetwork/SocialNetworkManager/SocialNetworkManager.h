@@ -13,7 +13,6 @@
 #import "GPPShare.h"
 
 
-
 #define IOS_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
 #define IOS_VERSION_GREATER_THAN(v)              ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedDescending)
 #define IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
@@ -55,7 +54,6 @@
                                 forDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
                           CompletionHandler:(void (^)(void))_Action;
 - (void)closeSessionAndClearToken;
-
 - (void)facebookPublishLink:(NSURL*)_Link
                     caption:(NSString*)_Caption
                 description:(NSString*)_Description
@@ -91,6 +89,11 @@
                            image:(UIImage*)_Image
                              url:(NSURL*)_URL
                      forDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate;
+
+
+
+- (BOOL) getTweetFromURL:(NSString*)_Tweet ForDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate;
+- (BOOL) isTwitterURL:(NSString*)_TweetURL;
 
 
 

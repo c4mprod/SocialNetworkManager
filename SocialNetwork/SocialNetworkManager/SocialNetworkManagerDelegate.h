@@ -26,6 +26,7 @@
 
 
 - (void)facebookDidSuccessfullyShare;
+- (void)facebookDidCancelShare;
 - (void)facebookDidFailShareWithStatus:(FBSessionState)_Status andError:(NSError*)_Error;
 
 - (void)facebookFriendPickerCancelled;

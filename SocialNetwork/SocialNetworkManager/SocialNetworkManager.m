@@ -14,7 +14,6 @@
 #import "AFNetworking.h"
 #import "SNMTweet.h"
 #import "JSONKit.h"
-#import "GPPShare.h"
 
 
 
@@ -82,12 +81,13 @@ static SocialNetworkManager *sharedInstance = nil;
         lErrorDetected = TRUE;
     }
     
-    if([[_Error.userInfo valueForKey:@"com.facebook.sdk:ErrorLoginFailedReason"] rangeOfString:@"com.facebook.sdk:SystemLoginDisallowedWithoutError"].location != NSNotFound)
+    BOOL isSystemDisallowedError = FALSE;
+    if([_Error.userInfo valueForKey:@"com.facebook.sdk:ErrorLoginFailedReason"] && [[_Error.userInfo valueForKey:@"com.facebook.sdk:ErrorLoginFailedReason"] rangeOfString:@"com.facebook.sdk:SystemLoginDisallowedWithoutError"].location != NSNotFound)
     {
-        lErrorDetected = TRUE;
+        isSystemDisallowedError = TRUE;
     }
     
-    if (lErrorDetected && [_Delegate respondsToSelector:@selector(facebookOSIntegratedDisabledWithStatus:andError:)])
+    if (isSystemDisallowedError && [_Delegate respondsToSelector:@selector(facebookOSIntegratedDisabledWithStatus:andError:)])
     {
         [_Delegate facebookOSIntegratedDisabledWithStatus:_Status andError:_Error];
         return TRUE;
@@ -136,18 +136,20 @@ static SocialNetworkManager *sharedInstance = nil;
         [self postFeedWithDescription:_Description
                                  link:_Link
                               caption:_Caption
+                              picture:_Picture
                              delegate:_Delegate];
     }
     else
     {
         // Lastly, fall back on a request for permissions and a direct post using the Graph API
-        [self loginFacebookWithPublishPermissions:nil
+        [self loginFacebookWithPublishPermissions:[NSArray arrayWithObject:@"publish_actions"]
                                       forDelegate:_Delegate
                                 CompletionHandler:^
          {
              [self postFeedWithDescription:_Description
                                       link:_Link
                                    caption:_Caption
+                                   picture:_Picture
                                   delegate:_Delegate];
          }];
     }
@@ -266,6 +268,7 @@ static SocialNetworkManager *sharedInstance = nil;
 {
     NSMutableArray* lNotGrandedPermissions = [NSMutableArray array];
     
+    
     for (NSString* aPermission in _Permissions)
     {
         if ([FBSession.activeSession.permissions indexOfObject:aPermission] == NSNotFound)
@@ -300,7 +303,7 @@ static SocialNetworkManager *sharedInstance = nil;
 }
 
 
-- (void)postFeedWithDescription:(NSString*)_Description
+/*- (void)postFeedWithDescription:(NSString*)_Description
                            link:(NSURL*)_Link
                         caption:(NSString*)_Caption
                        delegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
@@ -312,6 +315,7 @@ static SocialNetworkManager *sharedInstance = nil;
     [_Params setValue: [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"] forKey:@"name"];
     [_Params setObject:_Link.absoluteString forKey:@"link"];
     [_Params setObject:_Caption forKey:@"caption"];
+    
     
     [FBRequestConnection startWithGraphPath:@"me/feed"
                                  parameters:_Params
@@ -327,6 +331,91 @@ static SocialNetworkManager *sharedInstance = nil;
              [self notifyDelegateForFacebookShareFail:_Delegate ForError:_Error withStatus:FBSession.activeSession.state];
          }
      }];
+}*/
+
+
+- (void)postFeedWithDescription:(NSString*)_Description
+                           link:(NSURL*)_Link
+                        caption:(NSString*)_Caption
+                        picture:(NSURL*)_PictureURL
+                       delegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
+{  
+    
+    // If it is available, we will first try to post using the share dialog in the Facebook app
+    FBAppCall *appCall = [FBDialogs presentShareDialogWithLink:_Link
+                                                          name:nil
+                                                       caption:_Caption
+                                                   description:_Description
+                                                       picture:_PictureURL
+                                                   clientState:nil
+                                                       handler:^(FBAppCall *call, NSDictionary *results, NSError *_Error) {
+                                                           if ([results valueForKey:@"completionGesture"] && [[results valueForKey:@"completionGesture"] isEqualToString:@"cancel"])
+                                                           {
+                                                               [self notifyDelegateForFacebookShareCancelled:_Delegate];
+                                                           }
+                                                           else if ([results valueForKey:@"completionGesture"] && [[results valueForKey:@"completionGesture"] isEqualToString:@"post"])
+                                                           {
+                                                               [self notifyDelegateForFacebookShareSuccess:_Delegate];
+                                                           }
+                                                           else
+                                                           {
+                                                               [self notifyDelegateForFacebookShareFail:_Delegate ForError:_Error withStatus:FBSession.activeSession.state];
+                                                           }
+                                                           
+                                                       }];
+    
+    if (!appCall)
+    {
+        if ([FBDialogs canPresentOSIntegratedShareDialogWithSession:FBSession.activeSession])
+        {
+            // Next try to post using Facebook's iOS6 integration
+            [FBDialogs presentOSIntegratedShareDialogModallyFrom:[_Delegate viewControllerToPresentSocialNetwork]
+                                                     initialText:_Description
+                                                           image:nil
+                                                             url:_Link
+                                                         handler:^(FBOSIntegratedShareDialogResult result, NSError *_Error)
+             {
+                 if (!_Error && FBOSIntegratedShareDialogResultSucceeded == result)
+                 {
+                     [self notifyDelegateForFacebookShareSuccess:_Delegate];
+                 }
+                 else if (!_Error && FBOSIntegratedShareDialogResultCancelled == result)
+                 {
+                     [self notifyDelegateForFacebookShareCancelled:_Delegate];
+                 }
+                 else
+                 {
+                     [self notifyDelegateForFacebookShareFail:_Delegate ForError:_Error withStatus:FBSession.activeSession.state];
+                 }
+             }];
+        }
+        else
+        {
+            // Lastly, fall back on a request for permissions and a direct post using the Graph API
+            NSMutableDictionary* _Params = [NSMutableDictionary dictionary];
+            [_Params setValue:_Description forKey:@"description"];
+            [_Params setValue: [[NSBundle mainBundle] objectForInfoDictionaryKey:@"FacebookAppID"] forKey:@"app_id"];
+            [_Params setValue: [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"] forKey:@"name"];
+            [_Params setObject:_Link.absoluteString forKey:@"link"];
+            [_Params setObject:_Caption forKey:@"caption"];
+            
+            
+            [FBRequestConnection startWithGraphPath:@"me/feed"
+                                         parameters:_Params
+                                         HTTPMethod:@"POST"
+                                  completionHandler:^(FBRequestConnection* _RequestConnection, id _Result, NSError* _Error)
+             {
+                 if (!_Error)
+                 {
+                     [self notifyDelegateForFacebookShareSuccess:_Delegate];
+                 }
+                 else
+                 {
+                     [self notifyDelegateForFacebookShareFail:_Delegate ForError:_Error withStatus:FBSession.activeSession.state];
+                 }
+             }];
+        }
+    }
 }
 
 
@@ -543,7 +632,6 @@ static SocialNetworkManager *sharedInstance = nil;
                 switch (result) {
                     case SLComposeViewControllerResultCancelled:
                         [self notifyDelegateForTwitterShareCancelledForDelegate:_Delegate];
-                        [tweetSheet dismissModalViewControllerAnimated:TRUE];
                         break;
                     case SLComposeViewControllerResultDone:
                         [self notifyDelegateForTwitterShareSuccess:_Delegate];
@@ -552,6 +640,7 @@ static SocialNetworkManager *sharedInstance = nil;
                     default:
                         break;
                 }
+                [tweetSheet dismissModalViewControllerAnimated:TRUE];
             }];
             [[_Delegate viewControllerToPresentSocialNetwork] presentModalViewController:tweetSheet animated:TRUE];
         }
@@ -611,8 +700,11 @@ static SocialNetworkManager *sharedInstance = nil;
              }
                                              failure:^(AFHTTPRequestOperation *operation, NSError *error)
              {
-                 [_Delegate didFailGettingTweet:error];
-             }];
+                 if ([_Delegate respondsToSelector:@selector(didFailGettingTweet:)])
+                 {
+                     [_Delegate didFailGettingTweet:error];
+                 }
+                }];
             AFHTTPClient* client = [AFHTTPClient clientWithBaseURL:[NSURL URLWithString:@"c4mprod.com"]];
             [client enqueueHTTPRequestOperation:operation];
             isURLCompatible = YES;
@@ -743,7 +835,18 @@ static SocialNetworkManager *sharedInstance = nil;
 }
 
 
-- (void)notifyDelegateForFacebookShareFail:(NSObject<SocialNetworkManagerDelegate>*)_Delegate ForError:(NSError*)_Error withStatus:(FBSessionState)_Status
+- (void)notifyDelegateForFacebookShareCancelled:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
+{
+    if ([_Delegate respondsToSelector:@selector(facebookDidCancelShare)])
+    {
+        [_Delegate facebookDidCancelShare];
+    }
+}
+
+
+- (void)notifyDelegateForFacebookShareFail:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
+                                  ForError:(NSError*)_Error
+                                withStatus:(FBSessionState)_Status
 {
     if ([self checkForOSIntegratedFacebookError:_Error
                                     forDelegate:_Delegate
