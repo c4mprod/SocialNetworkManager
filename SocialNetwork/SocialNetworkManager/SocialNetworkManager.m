@@ -751,6 +751,7 @@ static SocialNetworkManager *sharedInstance = nil;
                     picture:(NSURL*)_Picture
                    delegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
 {
+    C4MLog(@"");
     self.mDelegate = _Delegate;
     [GPPShare sharedInstance].delegate = self;
     id<GPPShareBuilder> shareBuilder = [[GPPShare sharedInstance] shareDialog];
