@@ -452,26 +452,45 @@ static SocialNetworkManager *sharedInstance = nil;
 {
     if ([MFMailComposeViewController canSendMail])
     {
-        MFMailComposeViewController *mailComposeController = [[MFMailComposeViewController alloc] init];
-        mailComposeController.mailComposeDelegate = self;
-        self.mDelegate = _Delegate;
+        // remove the custom nav bar font
+       	NSMutableDictionary* navBarTitleAttributes = [[UINavigationBar appearance] titleTextAttributes].mutableCopy;
+        UIFont* navBarTitleFont = navBarTitleAttributes[UITextAttributeFont];
+        navBarTitleAttributes[UITextAttributeFont] = [UIFont systemFontOfSize:navBarTitleFont.pointSize];
+        [[UINavigationBar appearance] setTitleTextAttributes:navBarTitleAttributes];
         
-        
-        mailComposeController.navigationBar.barStyle = [_Delegate viewControllerToPresentSocialNetwork].navigationController.navigationBar.barStyle;
-        mailComposeController.navigationBar.tintColor = [_Delegate viewControllerToPresentSocialNetwork].navigationController.navigationBar.tintColor;
-        mailComposeController.title = _Subject;
-        
+        // set up and present the MFMailComposeViewController
+        MFMailComposeViewController *mailComposer = [[MFMailComposeViewController alloc] init];
+        mailComposer.mailComposeDelegate = self;
+        [mailComposer setSubject:_Subject];
+        [mailComposer setMessageBody:_Body isHTML:YES];
         if (_AddresseesMail && [_AddresseesMail count] != 0)
         {
-            [mailComposeController setToRecipients:_AddresseesMail];
+            [mailComposer setToRecipients:_AddresseesMail];
         }
         
-        [mailComposeController setSubject:_Subject];
-        
-        [mailComposeController setMessageBody:_Body isHTML:_Html];
-        
-        [[_Delegate viewControllerToPresentSocialNetwork] presentModalViewController:mailComposeController animated:TRUE];
-        [mailComposeController release];
+        mailComposer.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+        [[_Delegate viewControllerToPresentSocialNetwork] presentViewController:mailComposer animated:YES completion:^{}];
+        [mailComposer release];
+//        MFMailComposeViewController *mailComposeController = [[MFMailComposeViewController alloc] init];
+//        mailComposeController.mailComposeDelegate = self;
+//        self.mDelegate = _Delegate;
+//        
+//        
+//        mailComposeController.navigationBar.barStyle = [_Delegate viewControllerToPresentSocialNetwork].navigationController.navigationBar.barStyle;
+//        mailComposeController.navigationBar.tintColor = [_Delegate viewControllerToPresentSocialNetwork].navigationController.navigationBar.tintColor;
+//        mailComposeController.title = _Subject;
+//        
+//        if (_AddresseesMail && [_AddresseesMail count] != 0)
+//        {
+//            [mailComposeController setToRecipients:_AddresseesMail];
+//        }
+//        
+//        [mailComposeController setSubject:_Subject];
+//        
+//        [mailComposeController setMessageBody:_Body isHTML:_Html];
+//        
+//        [[_Delegate viewControllerToPresentSocialNetwork] presentModalViewController:mailComposeController animated:TRUE];
+//        [mailComposeController release];
     }
 	else
 	{
