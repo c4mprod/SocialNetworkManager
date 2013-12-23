@@ -457,6 +457,7 @@ static SocialNetworkManager *sharedInstance = nil;
         UIFont* navBarTitleFont = navBarTitleAttributes[UITextAttributeFont];
         navBarTitleAttributes[UITextAttributeFont] = [UIFont systemFontOfSize:navBarTitleFont.pointSize];
         [[UINavigationBar appearance] setTitleTextAttributes:navBarTitleAttributes];
+        [navBarTitleAttributes release];
         
         // set up and present the MFMailComposeViewController
         MFMailComposeViewController *mailComposer = [[MFMailComposeViewController alloc] init];
