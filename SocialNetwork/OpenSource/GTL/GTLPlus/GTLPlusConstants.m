@@ -29,10 +29,13 @@
 #import "GTLPlusConstants.h"
 
 // Authorization scope
-NSString * const kGTLAuthScopePlusLogin = @"https://www.googleapis.com/auth/plus.login";
-NSString * const kGTLAuthScopePlusMe    = @"https://www.googleapis.com/auth/plus.me";
+NSString * const kGTLAuthScopePlusLogin           = @"https://www.googleapis.com/auth/plus.login";
+NSString * const kGTLAuthScopePlusMe              = @"https://www.googleapis.com/auth/plus.me";
+NSString * const kGTLAuthScopePlusUserinfoEmail   = @"https://www.googleapis.com/auth/userinfo.email";
+NSString * const kGTLAuthScopePlusUserinfoProfile = @"https://www.googleapis.com/auth/userinfo.profile";
 
 // Collection
+NSString * const kGTLPlusCollectionConnected = @"connected";
 NSString * const kGTLPlusCollectionPlusoners = @"plusoners";
 NSString * const kGTLPlusCollectionPublic    = @"public";
 NSString * const kGTLPlusCollectionResharers = @"resharers";

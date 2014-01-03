@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Google Inc.
+/* Copyright (c) 2013 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  */
 
 //
-//  GTLPlusActivityFeed.m
+//  GTLPlusPlace.m
 //
 
 // ----------------------------------------------------------------------------
@@ -26,39 +26,42 @@
 // Documentation:
 //   https://developers.google.com/+/api/
 // Classes:
-//   GTLPlusActivityFeed (0 custom class methods, 9 custom properties)
+//   GTLPlusPlace (0 custom class methods, 4 custom properties)
+//   GTLPlusPlaceAddress (0 custom class methods, 1 custom properties)
+//   GTLPlusPlacePosition (0 custom class methods, 2 custom properties)
 
-#import "GTLPlusActivityFeed.h"
-
-#import "GTLPlusActivity.h"
+#import "GTLPlusPlace.h"
 
 // ----------------------------------------------------------------------------
 //
-//   GTLPlusActivityFeed
+//   GTLPlusPlace
 //
 
-@implementation GTLPlusActivityFeed
-@dynamic ETag, identifier, items, kind, nextLink, nextPageToken, selfLink,
-         title, updated;
-
-+ (NSDictionary *)propertyToJSONKeyMap {
-  NSDictionary *map =
-    [NSDictionary dictionaryWithObjectsAndKeys:
-      @"etag", @"ETag",
-      @"id", @"identifier",
-      nil];
-  return map;
-}
-
-+ (NSDictionary *)arrayPropertyToClassMap {
-  NSDictionary *map =
-    [NSDictionary dictionaryWithObject:[GTLPlusActivity class]
-                                forKey:@"items"];
-  return map;
-}
+@implementation GTLPlusPlace
+@dynamic address, displayName, kind, position;
 
 + (void)load {
-  [self registerObjectClassForKind:@"plus#activityFeed"];
+  [self registerObjectClassForKind:@"plus#place"];
 }
 
+@end
+
+
+// ----------------------------------------------------------------------------
+//
+//   GTLPlusPlaceAddress
+//
+
+@implementation GTLPlusPlaceAddress
+@dynamic formatted;
+@end
+
+
+// ----------------------------------------------------------------------------
+//
+//   GTLPlusPlacePosition
+//
+
+@implementation GTLPlusPlacePosition
+@dynamic latitude, longitude;
 @end
