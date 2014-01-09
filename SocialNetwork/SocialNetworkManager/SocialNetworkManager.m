@@ -72,6 +72,7 @@ static SocialNetworkManager *sharedInstance = nil;
                               forDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
                                withStatus:(FBSessionState)_Status
 {
+#warning Value stored to 'lErrorDetected' is never read
     BOOL lErrorDetected = FALSE;
     
     if ([SLComposeViewController class] != nil &&
