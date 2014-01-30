@@ -159,7 +159,7 @@ static SocialNetworkManager *sharedInstance = nil;
 
 - (void)facebookPresentFriendPickerForDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
 {
-    //Facebook setup on users device.
+    // Facebook setup on users device.
     BOOL haveIntegratedFacebookAtAll = ([SLComposeViewController class] != nil);
     
     if (FBSession.activeSession.accessTokenData.loginType == FBSessionLoginTypeFacebookApplication &&
@@ -174,7 +174,7 @@ static SocialNetworkManager *sharedInstance = nil;
     }
     
     
-    if(FB_ISSESSIONOPENWITHSTATE(FBSession.activeSession.state))
+    if (FB_ISSESSIONOPENWITHSTATE(FBSession.activeSession.state))
     {
         [self presentFriendPickerForDelegate:_Delegate];
     }
@@ -228,9 +228,9 @@ static SocialNetworkManager *sharedInstance = nil;
                              forDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
                        CompletionHandler:(void (^)(void))_Action
 {
-    NSMutableArray* lNotGrandedPermissions = [NSMutableArray array];
+    NSMutableArray *lNotGrandedPermissions = [NSMutableArray array];
     
-    for (NSString* aPermission in _Permissions)
+    for (NSString *aPermission in _Permissions)
     {
         if ([FBSession.activeSession.permissions indexOfObject:aPermission] == NSNotFound)
         {
@@ -267,10 +267,9 @@ static SocialNetworkManager *sharedInstance = nil;
                                 forDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
                           CompletionHandler:(void (^)(void))_Action
 {
-    NSMutableArray* lNotGrandedPermissions = [NSMutableArray array];
+    NSMutableArray *lNotGrandedPermissions = [NSMutableArray array];
     
-    
-    for (NSString* aPermission in _Permissions)
+    for (NSString *aPermission in _Permissions)
     {
         if ([FBSession.activeSession.permissions indexOfObject:aPermission] == NSNotFound)
         {
@@ -671,7 +670,7 @@ static SocialNetworkManager *sharedInstance = nil;
 
 - (void)loginTwitterForDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate completionHandler:(void (^)(void))_Action
 {
-    ACAccountStore* lAccountStore = [[ACAccountStore alloc] init];
+    ACAccountStore *lAccountStore = [[ACAccountStore alloc] init];
     ACAccountType *twitterType = [lAccountStore accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierTwitter];
     
     [lAccountStore requestAccessToAccountsWithType:twitterType
@@ -696,20 +695,20 @@ static SocialNetworkManager *sharedInstance = nil;
 {
     BOOL isURLCompatible = NO;
     
-    //            NSString* tweeturl = [NSString stringWithFormat:@"https://api.twitter.com/1/statuses/show/%@.json",[array objectAtIndex:1]];
-    NSArray* array = [_Tweet componentsSeparatedByString:@"https://twitter.com/"];
-    if([array count] != 2)
+    //            NSString *tweeturl = [NSString stringWithFormat:@"https://api.twitter.com/1/statuses/show/%@.json",[array objectAtIndex:1]];
+    NSArray *array = [_Tweet componentsSeparatedByString:@"https://twitter.com/"];
+    if ([array count] != 2)
     {
         array = [_Tweet componentsSeparatedByString:@"https://mobile.twitter.com/"];
     }
     
-    if([array count] == 2)
+    if ([array count] == 2)
     {
-        NSString* string = [array objectAtIndex:1];
+        NSString *string = [array objectAtIndex:1];
         array = [string componentsSeparatedByString:@"/status/"];
-        if([array count] == 2)
+        if ([array count] == 2)
         {
-            NSString* tweeturl = [NSString stringWithFormat:@"https://api.twitter.com/1/statuses/show.json?id=%@&include_entities=true",[array objectAtIndex:1]];
+            NSString *tweeturl = [NSString stringWithFormat:@"https://api.twitter.com/1/statuses/show.json?id=%@&include_entities=true",[array objectAtIndex:1]];
             NSURLRequest * request= [NSURLRequest requestWithURL:[NSURL URLWithString:tweeturl]];
             AFHTTPRequestOperation *operation = [[[AFHTTPRequestOperation alloc] initWithRequest:request] autorelease];
             [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject)
@@ -726,7 +725,7 @@ static SocialNetworkManager *sharedInstance = nil;
                      [_Delegate didFailGettingTweet:error];
                  }
                 }];
-            AFHTTPClient* client = [AFHTTPClient clientWithBaseURL:[NSURL URLWithString:@"c4mprod.com"]];
+            AFHTTPClient *client = [AFHTTPClient clientWithBaseURL:[NSURL URLWithString:@"c4mprod.com"]];
             [client enqueueHTTPRequestOperation:operation];
             isURLCompatible = YES;
         }
@@ -741,17 +740,17 @@ static SocialNetworkManager *sharedInstance = nil;
 - (BOOL) isTwitterURL:(NSString*)_TweetURL
 {
     BOOL isURLCompatible = NO;
-    NSArray* array = [_TweetURL componentsSeparatedByString:@"https://twitter.com/"];
-    if([array count] != 2)
+    NSArray *array = [_TweetURL componentsSeparatedByString:@"https://twitter.com/"];
+    if ([array count] != 2)
     {
         array = [_TweetURL componentsSeparatedByString:@"https://mobile.twitter.com/"];
     }
     
-    if([array count] == 2)
+    if ([array count] == 2)
     {
-        NSString* string = [array objectAtIndex:1];
+        NSString *string = [array objectAtIndex:1];
         array = [string componentsSeparatedByString:@"/status/"];
-        if([array count] == 2)
+        if ([array count] == 2)
         {
             isURLCompatible = YES;
         }
@@ -808,10 +807,10 @@ static SocialNetworkManager *sharedInstance = nil;
 
 - (void)notifyDelegateForFacebookSuccessLogin:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
 {
-  if ([_Delegate respondsToSelector:@selector(facebookSessionDidSuccessfullyLogin)])
-  {
-    [_Delegate facebookSessionDidSuccessfullyLogin];
-  }
+    if ([_Delegate respondsToSelector:@selector(facebookSessionDidSuccessfullyLogin)])
+    {
+        [_Delegate facebookSessionDidSuccessfullyLogin];
+    }
 }
 
 
@@ -823,7 +822,6 @@ static SocialNetworkManager *sharedInstance = nil;
     }
     
     [self closeSessionAndClearToken];
-    
 }
 
 
