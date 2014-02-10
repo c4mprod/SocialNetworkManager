@@ -28,70 +28,70 @@
 
 +(SNMTweet*)createTweetObjectWithDictionary:(NSDictionary*)_TweetDictionary
 {
-    SNMTweet* tweet = [[SNMTweet alloc] init];
-    if([_TweetDictionary isKindOfClass:[NSDictionary class]])
+    SNMTweet *tweet = [[[SNMTweet alloc] init] autorelease];
+    if ([_TweetDictionary isKindOfClass:[NSDictionary class]])
     {
-        if([[_TweetDictionary objectForKey:@"created_at"] isKindOfClass:[NSString class]])
+        if ([_TweetDictionary[@"created_at"] isKindOfClass:[NSString class]])
         {
-            NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+            NSDateFormatter *dateFormat = [[[NSDateFormatter alloc] init] autorelease];
             [dateFormat setDateFormat:@"EEE MMM dd HH:mm:ss z yyyy"];
-            tweet.mCreatedDate = [dateFormat dateFromString:[_TweetDictionary objectForKey:@"created_at"]];
-            [dateFormat release];
-        } else if([[_TweetDictionary objectForKey:@"created_at"] isKindOfClass:[NSDate class]])
+            tweet.mCreatedDate = [dateFormat dateFromString:_TweetDictionary[@"created_at"]];
+        }
+        else if ([_TweetDictionary[@"created_at"] isKindOfClass:[NSDate class]])
         {
-            tweet.mCreatedDate = [_TweetDictionary objectForKey:@"created_at"];
+            tweet.mCreatedDate = _TweetDictionary[@"created_at"];
         }
         
-        if([[_TweetDictionary objectForKey:@"favorite_count"] isKindOfClass:[NSNumber class]])
+        if ([_TweetDictionary[@"favorite_count"] isKindOfClass:[NSNumber class]])
         {
-            tweet.mFavoriteCount = [[_TweetDictionary objectForKey:@"favorite_count"] intValue];
+            tweet.mFavoriteCount = [_TweetDictionary[@"favorite_count"] intValue];
         }
         
-        if([[_TweetDictionary objectForKey:@"mFavorited"] isKindOfClass:[NSNumber class]])
+        if ([_TweetDictionary[@"mFavorited"] isKindOfClass:[NSNumber class]])
         {
-            tweet.mFavorited = [[_TweetDictionary objectForKey:@"mFavorited"] intValue];
+            tweet.mFavorited = [_TweetDictionary[@"mFavorited"] intValue];
         }
         
-        if([[_TweetDictionary objectForKey:@"id_str"] isKindOfClass:[NSString class]])
+        if ([_TweetDictionary[@"id_str"] isKindOfClass:[NSString class]])
         {
-            tweet.mId = [_TweetDictionary objectForKey:@"id_str"];
+            tweet.mId = _TweetDictionary[@"id_str"];
         }
         
-        if([[_TweetDictionary objectForKey:@"retweet_count"] isKindOfClass:[NSNumber class]])
+        if ([_TweetDictionary[@"retweet_count"] isKindOfClass:[NSNumber class]])
         {
-            tweet.mRetweetCount = [[_TweetDictionary objectForKey:@"retweet_count"] intValue];
+            tweet.mRetweetCount = [_TweetDictionary[@"retweet_count"] intValue];
         }
         
-        if([[_TweetDictionary objectForKey:@"text"] isKindOfClass:[NSString class]])
+        if ([_TweetDictionary[@"text"] isKindOfClass:[NSString class]])
         {
-            tweet.mText = [_TweetDictionary objectForKey:@"text"];
+            tweet.mText = _TweetDictionary[@"text"];
         }
         
-        if([[_TweetDictionary objectForKey:@"truncated"] isKindOfClass:[NSNumber class]])
+        if ([_TweetDictionary[@"truncated"] isKindOfClass:[NSNumber class]])
         {
-            tweet.mTruncated = [[_TweetDictionary objectForKey:@"truncated"] boolValue];
+            tweet.mTruncated = [_TweetDictionary[@"truncated"] boolValue];
         }
         
-        tweet.mUser = [SNMTweetUser createTweetUserWithDictionary:[_TweetDictionary objectForKey:@"user"]];
+        tweet.mUser = [SNMTweetUser createTweetUserWithDictionary:_TweetDictionary[@"user"]];
         
-        tweet.mURLTweet     = [NSString stringWithFormat:@"https://twitter.com/%@/status/%@",tweet.mUser.mScreenName, tweet.mId];
+        tweet.mURLTweet     = [NSString stringWithFormat:@"https://twitter.com/%@/status/%@", tweet.mUser.mScreenName, tweet.mId];
         
-        tweet.mTwitterAppLink  = [NSString stringWithFormat:@"twitter://status?id=%@",tweet.mId];
+        tweet.mTwitterAppLink  = [NSString stringWithFormat:@"twitter://status?id=%@", tweet.mId];
         
-        NSDictionary* entities = [_TweetDictionary objectForKey:@"entities"];
-        if([entities isKindOfClass:[NSDictionary class]])
+        NSDictionary *entities = _TweetDictionary[@"entities"];
+        if ([entities isKindOfClass:[NSDictionary class]])
         {
-            if([[entities objectForKey:@"media"] isKindOfClass:[NSArray class]])
+            if ([entities[@"media"] isKindOfClass:[NSArray class]])
             {
-                NSArray* array = [entities objectForKey:@"media"];
+                NSArray *array = entities[@"media"];
                 tweet.mArrayImages = [NSMutableArray array];
-                for(NSDictionary* dic in array)
+                for (NSDictionary *dic in array)
                 {
-                    if([dic isKindOfClass:[NSDictionary class]])
+                    if ([dic isKindOfClass:[NSDictionary class]])
                     {
-                        if([[dic objectForKey:@"media_url"] isKindOfClass:[NSString class]])
+                        if ([dic[@"media_url"] isKindOfClass:[NSString class]])
                         {
-                            [tweet.mArrayImages addObject:[dic objectForKey:@"media_url"]];
+                            [tweet.mArrayImages addObject:dic[@"media_url"]];
                         }
                     }
                 }
@@ -99,13 +99,13 @@
         }
         
     }
-    return [tweet autorelease];
+    return tweet;
 }
 
 
 - (NSString*) getImage:(int)_ImageIndex ForFormat:(int)_ImageFormat
 {
-    NSString* string;
+    NSString *string;
     switch (_ImageFormat) {
         case thumbFormat:
             string = @"thumb";
@@ -124,9 +124,9 @@
         break;
     }
     
-    if([self.mArrayImages count] > _ImageIndex)
+    if ([self.mArrayImages count] > _ImageIndex)
     {
-        return [NSString stringWithFormat:@"%@:%@",[self.mArrayImages objectAtIndex:_ImageIndex],string];
+        return [NSString stringWithFormat:@"%@:%@", (self.mArrayImages)[_ImageIndex], string];
     }
     else
     {

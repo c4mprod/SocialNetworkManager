@@ -10,7 +10,6 @@
 #import "SocialNetworkManagerDelegate.h"
 #import <Social/Social.h>
 #import <Twitter/Twitter.h>
-//#import "AFHTTPClient.h"
 #import "AFNetworking.h"
 #import "SNMTweet.h"
 #import "JSONKit.h"
@@ -18,9 +17,16 @@
 
 
 
+@interface SocialNetworkManager ()
+
+@property (nonatomic, strong) UIFont *mCustomNavBarFont;
+
+@end
+
+
 @implementation SocialNetworkManager
 
-
+@synthesize mCustomNavBarFont = mCustomNavBarFont;
 @synthesize mDelegate;
 
 static SocialNetworkManager *sharedInstance = nil;
@@ -58,6 +64,8 @@ static SocialNetworkManager *sharedInstance = nil;
 - (void)dealloc
 {
     [mDelegate release];
+    self.mCustomNavBarFont = nil;
+    
     [super dealloc];
 }
 
@@ -75,15 +83,16 @@ static SocialNetworkManager *sharedInstance = nil;
 #warning Value stored to 'lErrorDetected' is never read
     BOOL lErrorDetected = FALSE;
     
-    if ([SLComposeViewController class] != nil &&
-        FBSession.activeSession.accessTokenData.loginType == FBSessionLoginTypeSystemAccount &&
-        ![SLComposeViewController isAvailableForServiceType:SLServiceTypeFacebook])
+    if ([SLComposeViewController class] != nil
+        && FBSession.activeSession.accessTokenData.loginType == FBSessionLoginTypeSystemAccount
+        && ![SLComposeViewController isAvailableForServiceType:SLServiceTypeFacebook])
     {
         lErrorDetected = TRUE;
     }
     
     BOOL isSystemDisallowedError = FALSE;
-    if([_Error.userInfo valueForKey:@"com.facebook.sdk:ErrorLoginFailedReason"] && [[_Error.userInfo valueForKey:@"com.facebook.sdk:ErrorLoginFailedReason"] rangeOfString:@"com.facebook.sdk:SystemLoginDisallowedWithoutError"].location != NSNotFound)
+    if ([_Error.userInfo valueForKey:@"com.facebook.sdk:ErrorLoginFailedReason"]
+        && [[_Error.userInfo valueForKey:@"com.facebook.sdk:ErrorLoginFailedReason"] rangeOfString:@"com.facebook.sdk:SystemLoginDisallowedWithoutError"].location != NSNotFound)
     {
         isSystemDisallowedError = TRUE;
     }
@@ -117,22 +126,21 @@ static SocialNetworkManager *sharedInstance = nil;
                     picture:(NSURL*)_Picture
                    delegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
 {
-    //Facebook setup on users device.
+    // Facebook setup on users device.
     BOOL haveIntegratedFacebookAtAll = ([SLComposeViewController class] != nil);
     
-    if (FBSession.activeSession.accessTokenData.loginType == FBSessionLoginTypeFacebookApplication &&
-         ![[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"fb://"]])
+    if (FBSession.activeSession.accessTokenData.loginType == FBSessionLoginTypeFacebookApplication
+        && ![[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"fb://"]])
     {
         [self closeSessionAndClearToken];
     }
-    else if (FBSession.activeSession.accessTokenData.loginType == FBSessionLoginTypeSystemAccount &&
-              !(haveIntegratedFacebookAtAll && [SLComposeViewController isAvailableForServiceType:SLServiceTypeFacebook]))
+    else if (FBSession.activeSession.accessTokenData.loginType == FBSessionLoginTypeSystemAccount
+             && !(haveIntegratedFacebookAtAll && [SLComposeViewController isAvailableForServiceType:SLServiceTypeFacebook]))
     {
         [self closeSessionAndClearToken];
     }
     
-
-    if(FB_ISSESSIONOPENWITHSTATE(FBSession.activeSession.state))
+    if (FB_ISSESSIONOPENWITHSTATE(FBSession.activeSession.state))
     {
         [self postFeedWithDescription:_Description
                                  link:_Link
@@ -143,7 +151,7 @@ static SocialNetworkManager *sharedInstance = nil;
     else
     {
         // Lastly, fall back on a request for permissions and a direct post using the Graph API
-        [self loginFacebookWithPublishPermissions:[NSArray arrayWithObject:@"publish_actions"]
+        [self loginFacebookWithPublishPermissions:@[@"publish_actions"]
                                       forDelegate:_Delegate
                                 CompletionHandler:^
          {
@@ -162,17 +170,16 @@ static SocialNetworkManager *sharedInstance = nil;
     // Facebook setup on users device.
     BOOL haveIntegratedFacebookAtAll = ([SLComposeViewController class] != nil);
     
-    if (FBSession.activeSession.accessTokenData.loginType == FBSessionLoginTypeFacebookApplication &&
-        ![[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"fb://"]])
+    if (FBSession.activeSession.accessTokenData.loginType == FBSessionLoginTypeFacebookApplication
+        && ![[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"fb://"]])
     {
         [self closeSessionAndClearToken];
     }
-    else if (FBSession.activeSession.accessTokenData.loginType == FBSessionLoginTypeSystemAccount &&
-             !(haveIntegratedFacebookAtAll && [SLComposeViewController isAvailableForServiceType:SLServiceTypeFacebook]))
+    else if (FBSession.activeSession.accessTokenData.loginType == FBSessionLoginTypeSystemAccount
+             && !(haveIntegratedFacebookAtAll && [SLComposeViewController isAvailableForServiceType:SLServiceTypeFacebook]))
     {
         [self closeSessionAndClearToken];
     }
-    
     
     if (FB_ISSESSIONOPENWITHSTATE(FBSession.activeSession.state))
     {
@@ -303,24 +310,24 @@ static SocialNetworkManager *sharedInstance = nil;
 }
 
 
-/*- (void)postFeedWithDescription:(NSString*)_Description
+/*
+- (void)postFeedWithDescription:(NSString*)_Description
                            link:(NSURL*)_Link
                         caption:(NSString*)_Caption
                        delegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
 
 {
-    NSMutableDictionary* _Params = [NSMutableDictionary dictionary];
+    NSMutableDictionary *_Params = [NSMutableDictionary dictionary];
     [_Params setValue:_Description forKey:@"description"];
     [_Params setValue: [[NSBundle mainBundle] objectForInfoDictionaryKey:@"FacebookAppID"] forKey:@"app_id"];
     [_Params setValue: [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"] forKey:@"name"];
     [_Params setObject:_Link.absoluteString forKey:@"link"];
     [_Params setObject:_Caption forKey:@"caption"];
-    
-    
+ 
     [FBRequestConnection startWithGraphPath:@"me/feed"
                                  parameters:_Params
                                  HTTPMethod:@"POST"
-                          completionHandler:^(FBRequestConnection* _RequestConnection, id _Result, NSError* _Error)
+                          completionHandler:^(FBRequestConnection *_RequestConnection, id _Result, NSError *_Error)
      {
          if (!_Error)
          {
@@ -331,7 +338,8 @@ static SocialNetworkManager *sharedInstance = nil;
              [self notifyDelegateForFacebookShareFail:_Delegate ForError:_Error withStatus:FBSession.activeSession.state];
          }
      }];
-}*/
+}
+*/
 
 
 - (void)postFeedWithDescription:(NSString*)_Description
@@ -339,8 +347,7 @@ static SocialNetworkManager *sharedInstance = nil;
                         caption:(NSString*)_Caption
                         picture:(NSURL*)_PictureURL
                        delegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
-{  
-    
+{
     // If it is available, we will first try to post using the share dialog in the Facebook app
     FBAppCall *appCall = [FBDialogs presentShareDialogWithLink:_Link
                                                           name:nil
@@ -361,7 +368,6 @@ static SocialNetworkManager *sharedInstance = nil;
                                                            {
                                                                [self notifyDelegateForFacebookShareFail:_Delegate ForError:_Error withStatus:FBSession.activeSession.state];
                                                            }
-                                                           
                                                        }];
     
     if (!appCall)
@@ -392,18 +398,17 @@ static SocialNetworkManager *sharedInstance = nil;
         else
         {
             // Lastly, fall back on a request for permissions and a direct post using the Graph API
-            NSMutableDictionary* _Params = [NSMutableDictionary dictionary];
+            NSMutableDictionary *_Params = [NSMutableDictionary dictionary];
             [_Params setValue:_Description forKey:@"description"];
             [_Params setValue: [[NSBundle mainBundle] objectForInfoDictionaryKey:@"FacebookAppID"] forKey:@"app_id"];
             [_Params setValue: [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"] forKey:@"name"];
-            [_Params setObject:_Link.absoluteString forKey:@"link"];
-            [_Params setObject:_Caption forKey:@"caption"];
-            
+            _Params[@"link"] = _Link.absoluteString;
+            _Params[@"caption"] = _Caption;
             
             [FBRequestConnection startWithGraphPath:@"me/feed"
                                          parameters:_Params
                                          HTTPMethod:@"POST"
-                                  completionHandler:^(FBRequestConnection* _RequestConnection, id _Result, NSError* _Error)
+                                  completionHandler:^(FBRequestConnection *_RequestConnection, id _Result, NSError *_Error)
              {
                  if (!_Error)
                  {
@@ -427,7 +432,7 @@ static SocialNetworkManager *sharedInstance = nil;
     
     [friendPickerController presentModallyFromViewController:[_Delegate viewControllerToPresentSocialNetwork] animated:YES handler:
      ^(FBViewController *sender, BOOL donePressed) {
-         
+         [friendPickerController release];
          if (!donePressed) {
              [_Delegate facebookFriendPickerCancelled];
              return;
@@ -442,7 +447,22 @@ static SocialNetworkManager *sharedInstance = nil;
 #pragma mark -
 #pragma mark Mail Composer Delegate Methods
 
+- (void)removeCustomNavBarFont
+{
+    UINavigationBar *navigationBarAppearance = [UINavigationBar appearance];
+    NSMutableDictionary *navBarTitleAttributes = [[navigationBarAppearance.titleTextAttributes mutableCopy] autorelease];
+    self.mCustomNavBarFont = navBarTitleAttributes[UITextAttributeFont];
+    navBarTitleAttributes[UITextAttributeFont] = [UIFont systemFontOfSize:mCustomNavBarFont.pointSize];
+    navigationBarAppearance.titleTextAttributes = navBarTitleAttributes;
+}
 
+- (void)addCustomNavBarFont
+{
+    UINavigationBar *navigationBarAppearance = [UINavigationBar appearance];
+    NSMutableDictionary *navBarTitleAttributes = [[navigationBarAppearance.titleTextAttributes mutableCopy] autorelease];
+    navBarTitleAttributes[UITextAttributeFont] = mCustomNavBarFont;
+    navigationBarAppearance.titleTextAttributes = navBarTitleAttributes;
+}
 
 - (void)launchMailWithSubject:(NSString *)_Subject
                          body:(NSString *)_Body
@@ -453,45 +473,25 @@ static SocialNetworkManager *sharedInstance = nil;
     if ([MFMailComposeViewController canSendMail])
     {
         // remove the custom nav bar font
-       	NSMutableDictionary* navBarTitleAttributes = [[UINavigationBar appearance] titleTextAttributes].mutableCopy;
-        UIFont* navBarTitleFont = navBarTitleAttributes[UITextAttributeFont];
-        navBarTitleAttributes[UITextAttributeFont] = [UIFont systemFontOfSize:navBarTitleFont.pointSize];
-        [[UINavigationBar appearance] setTitleTextAttributes:navBarTitleAttributes];
-        [navBarTitleAttributes release];
+        [self removeCustomNavBarFont];
         
         // set up and present the MFMailComposeViewController
-        MFMailComposeViewController *mailComposer = [[MFMailComposeViewController alloc] init];
+        MFMailComposeViewController *mailComposer = [[[MFMailComposeViewController alloc] init] autorelease];
         mailComposer.mailComposeDelegate = self;
+        //self.mDelegate = _Delegate;
         [mailComposer setSubject:_Subject];
+        //[mailComposer setMessageBody:_Body isHTML:_Html];
         [mailComposer setMessageBody:_Body isHTML:YES];
         if (_AddresseesMail && [_AddresseesMail count] != 0)
         {
             [mailComposer setToRecipients:_AddresseesMail];
         }
         
+        //mailComposer.navigationBar.barStyle = [_Delegate viewControllerToPresentSocialNetwork].navigationController.navigationBar.barStyle;
+        //mailComposer.navigationBar.tintColor = [_Delegate viewControllerToPresentSocialNetwork].navigationController.navigationBar.tintColor;
+        //mailComposer.title = _Subject;
         mailComposer.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
         [[_Delegate viewControllerToPresentSocialNetwork] presentViewController:mailComposer animated:YES completion:^{}];
-        [mailComposer release];
-//        MFMailComposeViewController *mailComposeController = [[MFMailComposeViewController alloc] init];
-//        mailComposeController.mailComposeDelegate = self;
-//        self.mDelegate = _Delegate;
-//        
-//        
-//        mailComposeController.navigationBar.barStyle = [_Delegate viewControllerToPresentSocialNetwork].navigationController.navigationBar.barStyle;
-//        mailComposeController.navigationBar.tintColor = [_Delegate viewControllerToPresentSocialNetwork].navigationController.navigationBar.tintColor;
-//        mailComposeController.title = _Subject;
-//        
-//        if (_AddresseesMail && [_AddresseesMail count] != 0)
-//        {
-//            [mailComposeController setToRecipients:_AddresseesMail];
-//        }
-//        
-//        [mailComposeController setSubject:_Subject];
-//        
-//        [mailComposeController setMessageBody:_Body isHTML:_Html];
-//        
-//        [[_Delegate viewControllerToPresentSocialNetwork] presentModalViewController:mailComposeController animated:TRUE];
-//        [mailComposeController release];
     }
 	else
 	{
@@ -509,18 +509,20 @@ static SocialNetworkManager *sharedInstance = nil;
 {
     if ([MFMessageComposeViewController canSendText])
     {
-        MFMessageComposeViewController* smsViewController = [[MFMessageComposeViewController alloc] init];
+        // remove the custom nav bar font
+        [self removeCustomNavBarFont];
+        
+        MFMessageComposeViewController *smsViewController = [[[MFMessageComposeViewController alloc] init] autorelease];
         smsViewController.messageComposeDelegate = self;
-        [smsViewController setBody:_Text];
-        [smsViewController setRecipients:_Recipients];
+        smsViewController.body = _Text;
+        smsViewController.recipients = _Recipients;
         self.mDelegate = _Delegate;
         
+        UIViewController *vc = [_Delegate viewControllerToPresentSocialNetwork];
+        smsViewController.navigationBar.barStyle = vc.navigationController.navigationBar.barStyle;
+        smsViewController.navigationBar.tintColor = vc.navigationController.navigationBar.tintColor;
         
-        smsViewController.navigationBar.barStyle = [_Delegate viewControllerToPresentSocialNetwork].navigationController.navigationBar.barStyle;
-        smsViewController.navigationBar.tintColor = [_Delegate viewControllerToPresentSocialNetwork].navigationController.navigationBar.tintColor;
-        
-        
-        [[_Delegate viewControllerToPresentSocialNetwork] presentModalViewController:smsViewController animated:TRUE];
+        [vc presentViewController:smsViewController animated:TRUE completion:^{}];
     }
 	else
 	{
@@ -537,6 +539,8 @@ static SocialNetworkManager *sharedInstance = nil;
           didFinishWithResult:(MFMailComposeResult)_Result
                         error:(NSError*)_Error
 {
+    [self addCustomNavBarFont];
+    
 	[_Controller dismissViewControllerAnimated:TRUE completion:nil];
     
     switch (_Result) {
@@ -573,6 +577,8 @@ static SocialNetworkManager *sharedInstance = nil;
 
 - (void)messageComposeViewController:(MFMessageComposeViewController *)_Controller didFinishWithResult:(MessageComposeResult)_Result
 {
+    [self addCustomNavBarFont];
+    
     [_Controller dismissViewControllerAnimated:TRUE completion:nil];
     
     switch (_Result) {
@@ -670,12 +676,12 @@ static SocialNetworkManager *sharedInstance = nil;
 
 - (void)loginTwitterForDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate completionHandler:(void (^)(void))_Action
 {
-    ACAccountStore *lAccountStore = [[ACAccountStore alloc] init];
+    ACAccountStore *lAccountStore = [[[ACAccountStore alloc] init] autorelease];
     ACAccountType *twitterType = [lAccountStore accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierTwitter];
     
     [lAccountStore requestAccessToAccountsWithType:twitterType
                                            options:NULL
-                                        completion:^(BOOL _Granded, NSError* _Error)
+                                        completion:^(BOOL _Granded, NSError *_Error)
      {
          if (_Granded)
          {
@@ -686,8 +692,6 @@ static SocialNetworkManager *sharedInstance = nil;
              [self notifyDelegateForTwitterLoginFail:_Delegate ForError:_Error];
          }
      }];
-    
-    [lAccountStore release];
 }
 
 
@@ -695,7 +699,7 @@ static SocialNetworkManager *sharedInstance = nil;
 {
     BOOL isURLCompatible = NO;
     
-    //            NSString *tweeturl = [NSString stringWithFormat:@"https://api.twitter.com/1/statuses/show/%@.json",[array objectAtIndex:1]];
+    //NSString *tweeturl = [NSString stringWithFormat:@"https://api.twitter.com/1/statuses/show/%@.json", array[1]];
     NSArray *array = [_Tweet componentsSeparatedByString:@"https://twitter.com/"];
     if ([array count] != 2)
     {
@@ -704,18 +708,17 @@ static SocialNetworkManager *sharedInstance = nil;
     
     if ([array count] == 2)
     {
-        NSString *string = [array objectAtIndex:1];
+        NSString *string = array[1];
         array = [string componentsSeparatedByString:@"/status/"];
         if ([array count] == 2)
         {
-            NSString *tweeturl = [NSString stringWithFormat:@"https://api.twitter.com/1/statuses/show.json?id=%@&include_entities=true",[array objectAtIndex:1]];
+            NSString *tweeturl = [NSString stringWithFormat:@"https://api.twitter.com/1/statuses/show.json?id=%@&include_entities=true", array[1]];
             NSURLRequest * request= [NSURLRequest requestWithURL:[NSURL URLWithString:tweeturl]];
             AFHTTPRequestOperation *operation = [[[AFHTTPRequestOperation alloc] initWithRequest:request] autorelease];
             [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject)
              {
-                 NSString *filesContent					= [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
+                 NSString *filesContent					= [[[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding] autorelease];
                  id objectreponse						= [filesContent mutableObjectFromJSONString];
-                 [filesContent release];
                  [_Delegate didGetTweet:[SNMTweet createTweetObjectWithDictionary:objectreponse]];
              }
                                              failure:^(AFHTTPRequestOperation *operation, NSError *error)
@@ -748,7 +751,7 @@ static SocialNetworkManager *sharedInstance = nil;
     
     if ([array count] == 2)
     {
-        NSString *string = [array objectAtIndex:1];
+        NSString *string = array[1];
         array = [string componentsSeparatedByString:@"/status/"];
         if ([array count] == 2)
         {
@@ -829,17 +832,14 @@ static SocialNetworkManager *sharedInstance = nil;
                                   ForError:(NSError*)_Error
                                 withStatus:(FBSessionState)_Status
 {
-    if ([self checkForOSIntegratedFacebookError:_Error
-                                    forDelegate:_Delegate
-                                     withStatus:_Status])
+    if (![self checkForOSIntegratedFacebookError:_Error
+                                     forDelegate:_Delegate
+                                      withStatus:_Status])
     {
-        [self closeSessionAndClearToken];
-        return;
-    }
-    
-    if ([_Delegate respondsToSelector:@selector(facebookSessionDidFailLoginWithStatus:andError:)])
-    {
-        [_Delegate facebookSessionDidFailLoginWithStatus:_Status andError:_Error];
+        if ([_Delegate respondsToSelector:@selector(facebookSessionDidFailLoginWithStatus:andError:)])
+        {
+            [_Delegate facebookSessionDidFailLoginWithStatus:_Status andError:_Error];
+        }
     }
     
     [self closeSessionAndClearToken];
@@ -868,17 +868,14 @@ static SocialNetworkManager *sharedInstance = nil;
                                   ForError:(NSError*)_Error
                                 withStatus:(FBSessionState)_Status
 {
-    if ([self checkForOSIntegratedFacebookError:_Error
-                                    forDelegate:_Delegate
-                                     withStatus:_Status])
+    if (![self checkForOSIntegratedFacebookError:_Error
+                                     forDelegate:_Delegate
+                                      withStatus:_Status])
     {
-        [self closeSessionAndClearToken];
-        return;
-    }
-    
-    if ([_Delegate respondsToSelector:@selector(facebookDidFailShareWithStatus:andError:)])
-    {
-        [_Delegate facebookDidFailShareWithStatus:_Status andError:_Error];
+        if ([_Delegate respondsToSelector:@selector(facebookDidFailShareWithStatus:andError:)])
+        {
+            [_Delegate facebookDidFailShareWithStatus:_Status andError:_Error];
+        }
     }
     
     [self closeSessionAndClearToken];
