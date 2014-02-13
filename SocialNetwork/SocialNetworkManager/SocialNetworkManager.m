@@ -80,24 +80,27 @@ static SocialNetworkManager *sharedInstance = nil;
                               forDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
                                withStatus:(FBSessionState)_Status
 {
-#warning Value stored to 'lErrorDetected' is never read
+    /*
     BOOL lErrorDetected = FALSE;
     
-    if ([SLComposeViewController class] != nil
-        && FBSession.activeSession.accessTokenData.loginType == FBSessionLoginTypeSystemAccount
-        && ![SLComposeViewController isAvailableForServiceType:SLServiceTypeFacebook])
+    if ([SLComposeViewController class] != nil &&
+        FBSession.activeSession.accessTokenData.loginType == FBSessionLoginTypeSystemAccount &&
+        ![SLComposeViewController isAvailableForServiceType:SLServiceTypeFacebook])
     {
         lErrorDetected = TRUE;
     }
+    */
     
     BOOL isSystemDisallowedError = FALSE;
-    if ([_Error.userInfo valueForKey:@"com.facebook.sdk:ErrorLoginFailedReason"]
-        && [[_Error.userInfo valueForKey:@"com.facebook.sdk:ErrorLoginFailedReason"] rangeOfString:@"com.facebook.sdk:SystemLoginDisallowedWithoutError"].location != NSNotFound)
+    NSString *errorLoginFailedReason = [[_Error userInfo] valueForKey:@"com.facebook.sdk:ErrorLoginFailedReason"];
+    if (errorLoginFailedReason
+        && [errorLoginFailedReason rangeOfString:@"com.facebook.sdk:SystemLoginDisallowedWithoutError"].location != NSNotFound)
     {
         isSystemDisallowedError = TRUE;
     }
     
-    if (isSystemDisallowedError && [_Delegate respondsToSelector:@selector(facebookOSIntegratedDisabledWithStatus:andError:)])
+    if (isSystemDisallowedError
+        && [_Delegate respondsToSelector:@selector(facebookOSIntegratedDisabledWithStatus:andError:)])
     {
         [_Delegate facebookOSIntegratedDisabledWithStatus:_Status andError:_Error];
         return TRUE;
@@ -491,7 +494,7 @@ static SocialNetworkManager *sharedInstance = nil;
         //mailComposer.navigationBar.tintColor = [_Delegate viewControllerToPresentSocialNetwork].navigationController.navigationBar.tintColor;
         //mailComposer.title = _Subject;
         mailComposer.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-        [[_Delegate viewControllerToPresentSocialNetwork] presentViewController:mailComposer animated:YES completion:^{}];
+        [[_Delegate viewControllerToPresentSocialNetwork] presentViewController:mailComposer animated:YES completion:nil];
     }
 	else
 	{
@@ -522,7 +525,7 @@ static SocialNetworkManager *sharedInstance = nil;
         smsViewController.navigationBar.barStyle = vc.navigationController.navigationBar.barStyle;
         smsViewController.navigationBar.tintColor = vc.navigationController.navigationBar.tintColor;
         
-        [vc presentViewController:smsViewController animated:TRUE completion:^{}];
+        [vc presentViewController:smsViewController animated:TRUE completion:nil];
     }
 	else
 	{
@@ -632,7 +635,7 @@ static SocialNetworkManager *sharedInstance = nil;
                  switch (result) {
                      case SLComposeViewControllerResultCancelled:
                          [self notifyDelegateForTwitterShareCancelledForDelegate:_Delegate];
-                         [tweetSheet dismissModalViewControllerAnimated:TRUE];
+                         [tweetSheet dismissViewControllerAnimated:TRUE completion:nil];
                          break;
                      case SLComposeViewControllerResultDone:
                          [self notifyDelegateForTwitterShareSuccess:_Delegate];
@@ -642,7 +645,7 @@ static SocialNetworkManager *sharedInstance = nil;
                          break;
                  }
              }];
-            [[_Delegate viewControllerToPresentSocialNetwork] presentModalViewController:tweetSheet animated:TRUE];
+            [[_Delegate viewControllerToPresentSocialNetwork] presentViewController:tweetSheet animated:YES completion:nil];
         }
     }
     else if (IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"6.0"))
@@ -654,21 +657,21 @@ static SocialNetworkManager *sharedInstance = nil;
             [tweetSheet addImage:_Image];
             [tweetSheet addURL:_URL];
             [tweetSheet setCompletionHandler:^(SLComposeViewControllerResult result)
-            {
-                switch (result) {
-                    case SLComposeViewControllerResultCancelled:
-                        [self notifyDelegateForTwitterShareCancelledForDelegate:_Delegate];
-                        break;
-                    case SLComposeViewControllerResultDone:
-                        [self notifyDelegateForTwitterShareSuccess:_Delegate];
-                        break;
-                        
-                    default:
-                        break;
-                }
-                [tweetSheet dismissModalViewControllerAnimated:TRUE];
-            }];
-            [[_Delegate viewControllerToPresentSocialNetwork] presentModalViewController:tweetSheet animated:TRUE];
+             {
+                 switch (result) {
+                     case SLComposeViewControllerResultCancelled:
+                         [self notifyDelegateForTwitterShareCancelledForDelegate:_Delegate];
+                         break;
+                     case SLComposeViewControllerResultDone:
+                         [self notifyDelegateForTwitterShareSuccess:_Delegate];
+                         break;
+                         
+                     default:
+                         break;
+                 }
+                 [tweetSheet dismissViewControllerAnimated:TRUE completion:nil];
+             }];
+            [[_Delegate viewControllerToPresentSocialNetwork] presentViewController:tweetSheet animated:YES completion:nil];
         }
     }
 }
@@ -686,7 +689,7 @@ static SocialNetworkManager *sharedInstance = nil;
          if (_Granded)
          {
              [self notifyDelegateForTwitterSuccessLogin:_Delegate];
-        }
+         }
          else
          {
              [self notifyDelegateForTwitterLoginFail:_Delegate ForError:_Error];

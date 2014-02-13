@@ -126,7 +126,7 @@
     
     if ([self.mArrayImages count] > _ImageIndex)
     {
-        return [NSString stringWithFormat:@"%@:%@", (self.mArrayImages)[_ImageIndex], string];
+        return [NSString stringWithFormat:@"%@:%@", self.mArrayImages[_ImageIndex], string];
     }
     else
     {
