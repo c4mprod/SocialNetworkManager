@@ -16,7 +16,6 @@
 
 
 
-
 @interface SocialNetworkManager ()
 
 @property (nonatomic, strong) UIFont *mCustomNavBarFont;
@@ -429,7 +428,7 @@ static SocialNetworkManager *sharedInstance = nil;
 
 - (void)presentFriendPickerForDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
 {
-    FBFriendPickerViewController *friendPickerController = [[FBFriendPickerViewController alloc] init];
+    FBFriendPickerViewController *friendPickerController = [FBFriendPickerViewController new];
     friendPickerController.title = @"Pick Friends";
     [friendPickerController loadData];
     
@@ -479,7 +478,7 @@ static SocialNetworkManager *sharedInstance = nil;
         [self removeCustomNavBarFont];
         
         // set up and present the MFMailComposeViewController
-        MFMailComposeViewController *mailComposer = [[[MFMailComposeViewController alloc] init] autorelease];
+        MFMailComposeViewController *mailComposer = [[MFMailComposeViewController new] autorelease];
         mailComposer.mailComposeDelegate = self;
         //self.mDelegate = _Delegate;
         [mailComposer setSubject:_Subject];
@@ -515,7 +514,7 @@ static SocialNetworkManager *sharedInstance = nil;
         // remove the custom nav bar font
         [self removeCustomNavBarFont];
         
-        MFMessageComposeViewController *smsViewController = [[[MFMessageComposeViewController alloc] init] autorelease];
+        MFMessageComposeViewController *smsViewController = [[MFMessageComposeViewController new] autorelease];
         smsViewController.messageComposeDelegate = self;
         smsViewController.body = _Text;
         smsViewController.recipients = _Recipients;
@@ -626,7 +625,7 @@ static SocialNetworkManager *sharedInstance = nil;
     {
         //if ([TWTweetComposeViewController canSendTweet])
         {
-            TWTweetComposeViewController *tweetSheet = [[TWTweetComposeViewController alloc] init];
+            TWTweetComposeViewController *tweetSheet = [TWTweetComposeViewController new];
             [tweetSheet setInitialText:_Text];
             [tweetSheet addImage:_Image];
             [tweetSheet addURL:_URL];
@@ -645,7 +644,9 @@ static SocialNetworkManager *sharedInstance = nil;
                          break;
                  }
              }];
-            [[_Delegate viewControllerToPresentSocialNetwork] presentViewController:tweetSheet animated:YES completion:nil];
+            [[_Delegate viewControllerToPresentSocialNetwork] presentViewController:tweetSheet animated:YES completion:^{
+                [tweetSheet autorelease];
+            }];
         }
     }
     else if (IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"6.0"))

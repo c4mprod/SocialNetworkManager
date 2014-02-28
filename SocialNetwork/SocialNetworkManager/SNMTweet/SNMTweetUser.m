@@ -8,6 +8,7 @@
 
 #import "SNMTweetUser.h"
 
+
 @implementation SNMTweetUser
 
 -(void)dealloc

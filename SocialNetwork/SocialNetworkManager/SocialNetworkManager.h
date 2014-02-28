@@ -23,10 +23,11 @@
 
 #endif
 
+
 @interface SocialNetworkManager : NSObject <MFMailComposeViewControllerDelegate, MFMessageComposeViewControllerDelegate, GPPShareDelegate>
 
 
-@property (nonatomic, retain) NSObject<SocialNetworkManagerDelegate>*  mDelegate;
+@property (nonatomic, retain) NSObject<SocialNetworkManagerDelegate> *mDelegate;
 
 + (SocialNetworkManager*)sharedSocialNetworkManager;
 + (void)releaseSharedSocialNetworkManager;
