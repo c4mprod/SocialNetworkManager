@@ -321,9 +321,9 @@ static SocialNetworkManager *sharedInstance = nil;
 {
     NSMutableDictionary *_Params = [NSMutableDictionary dictionary];
     [_Params setValue:_Description forKey:@"description"];
-    [_Params setValue: [[NSBundle mainBundle] objectForInfoDictionaryKey:@"FacebookAppID"] forKey:@"app_id"];
-    [_Params setValue: [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"] forKey:@"name"];
-    [_Params setObject:_Link.absoluteString forKey:@"link"];
+    [_Params setValue:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"FacebookAppID"] forKey:@"app_id"];
+    [_Params setValue:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"] forKey:@"name"];
+    [_Params setObject:[_Link absoluteString] forKey:@"link"];
     [_Params setObject:_Caption forKey:@"caption"];
  
     [FBRequestConnection startWithGraphPath:@"me/feed"
@@ -402,9 +402,9 @@ static SocialNetworkManager *sharedInstance = nil;
             // Lastly, fall back on a request for permissions and a direct post using the Graph API
             NSMutableDictionary *_Params = [NSMutableDictionary dictionary];
             [_Params setValue:_Description forKey:@"description"];
-            [_Params setValue: [[NSBundle mainBundle] objectForInfoDictionaryKey:@"FacebookAppID"] forKey:@"app_id"];
-            [_Params setValue: [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"] forKey:@"name"];
-            _Params[@"link"] = _Link.absoluteString;
+            [_Params setValue:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"FacebookAppID"] forKey:@"app_id"];
+            [_Params setValue:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"] forKey:@"name"];
+            _Params[@"link"] = [_Link absoluteString];
             _Params[@"caption"] = _Caption;
             
             [FBRequestConnection startWithGraphPath:@"me/feed"
