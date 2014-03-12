@@ -12,18 +12,22 @@
 #import <MessageUI/MessageUI.h>
 #import "GPPShare.h"
 
+#ifndef IOS_VERSION_MACROS
+#define IOS_VERSION_MACROS
 
-#define IOS_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
-#define IOS_VERSION_GREATER_THAN(v)              ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedDescending)
-#define IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
-#define IOS_VERSION_LESS_THAN(v)                 ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
-#define IOS_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
+#define IOS_VERSION_EQUAL_TO(v)                  ([[UIDevice currentDevice].systemVersion compare:v options:NSNumericSearch] == NSOrderedSame)
+#define IOS_VERSION_GREATER_THAN(v)              ([[UIDevice currentDevice].systemVersion compare:v options:NSNumericSearch] == NSOrderedDescending)
+#define IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[UIDevice currentDevice].systemVersion compare:v options:NSNumericSearch] != NSOrderedAscending)
+#define IOS_VERSION_LESS_THAN(v)                 ([[UIDevice currentDevice].systemVersion compare:v options:NSNumericSearch] == NSOrderedAscending)
+#define IOS_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[UIDevice currentDevice].systemVersion compare:v options:NSNumericSearch] != NSOrderedDescending)
+
+#endif
 
 
 @interface SocialNetworkManager : NSObject <MFMailComposeViewControllerDelegate, MFMessageComposeViewControllerDelegate, GPPShareDelegate>
 
 
-@property (nonatomic, retain) NSObject<SocialNetworkManagerDelegate>*  mDelegate;
+@property (nonatomic, retain) NSObject<SocialNetworkManagerDelegate> *mDelegate;
 
 + (SocialNetworkManager*)sharedSocialNetworkManager;
 + (void)releaseSharedSocialNetworkManager;
@@ -92,8 +96,8 @@
 
 
 
-- (BOOL) getTweetFromURL:(NSString*)_Tweet ForDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate;
-- (BOOL) isTwitterURL:(NSString*)_TweetURL;
+- (BOOL)getTweetFromURL:(NSString*)_Tweet forDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate;
+- (BOOL)isTwitterURL:(NSString*)_TweetURL;
 
 
 

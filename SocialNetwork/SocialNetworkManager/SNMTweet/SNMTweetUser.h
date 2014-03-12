@@ -8,17 +8,18 @@
 
 #import <Foundation/Foundation.h>
 
+
 @interface SNMTweetUser : NSObject
 
-@property (nonatomic, retain)   NSDate*         mCreatedDate;
-@property (nonatomic, retain)   NSString*       mDescription;
+@property (nonatomic, retain)   NSDate *        mCreatedDate;
+@property (nonatomic, retain)   NSString *      mDescription;
 @property (nonatomic)           int             mFavoriteCount;
 @property (nonatomic)           int             mFollowersCount;
 @property (nonatomic)           int             mFriendsCount;
-@property (nonatomic, retain)   NSString*       mId;
-@property (nonatomic, retain)   NSString*       mName;
-@property (nonatomic, retain)   NSString*       mImageLink;
-@property (nonatomic, retain)   NSString*       mScreenName;
+@property (nonatomic, retain)   NSString *      mId;
+@property (nonatomic, retain)   NSString *      mName;
+@property (nonatomic, retain)   NSString *      mImageLink;
+@property (nonatomic, retain)   NSString *      mScreenName;
 
 + (SNMTweetUser*) createTweetUserWithDictionary:(NSDictionary*)_UserTweet;
 @end
