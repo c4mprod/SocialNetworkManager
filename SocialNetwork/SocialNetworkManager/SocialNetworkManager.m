@@ -699,7 +699,7 @@ static SocialNetworkManager *sharedInstance = nil;
 }
 
 
-- (BOOL) getTweetFromURL:(NSString*)_Tweet ForDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
+- (BOOL)getTweetFromURL:(NSString*)_Tweet forDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate
 {
     BOOL isURLCompatible = NO;
     
@@ -717,7 +717,7 @@ static SocialNetworkManager *sharedInstance = nil;
         if ([array count] == 2)
         {
             NSString *tweeturl = [NSString stringWithFormat:@"https://api.twitter.com/1/statuses/show.json?id=%@&include_entities=true", array[1]];
-            NSURLRequest * request= [NSURLRequest requestWithURL:[NSURL URLWithString:tweeturl]];
+            NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:tweeturl]];
             AFHTTPRequestOperation *operation = [[[AFHTTPRequestOperation alloc] initWithRequest:request] autorelease];
             [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject)
              {
@@ -744,7 +744,7 @@ static SocialNetworkManager *sharedInstance = nil;
  * check if an url is twitter compatible
  * @return YES if the url tweet is compatible, NO if it's a wrong URL
  */
-- (BOOL) isTwitterURL:(NSString*)_TweetURL
+- (BOOL)isTwitterURL:(NSString*)_TweetURL
 {
     BOOL isURLCompatible = NO;
     NSArray *array = [_TweetURL componentsSeparatedByString:@"https://twitter.com/"];

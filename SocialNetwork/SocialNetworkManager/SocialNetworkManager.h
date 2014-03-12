@@ -96,8 +96,8 @@
 
 
 
-- (BOOL) getTweetFromURL:(NSString*)_Tweet ForDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate;
-- (BOOL) isTwitterURL:(NSString*)_TweetURL;
+- (BOOL)getTweetFromURL:(NSString*)_Tweet forDelegate:(NSObject<SocialNetworkManagerDelegate>*)_Delegate;
+- (BOOL)isTwitterURL:(NSString*)_TweetURL;
 
 
 
